@@ -1,6 +1,7 @@
 uniform vec2 u_resolution;
 uniform float u_time;
 uniform vec2 u_mouse;
+uniform vec3 u_camera_pos;
 
 const float MAX_DIST = 99999.0;
 
@@ -48,10 +49,10 @@ float plaIntersect( in vec3 ro, in vec3 rd, in vec4 p ) {
 
 vec3 CastRay( vec3 ro, vec3 rd, vec3 light_pos ) {
     
-    vec3 sphere_pos = vec3( 0.0, -0.5, 0.0 );
+    vec3 sphere_pos = vec3( 0.0, 0.0, 0.0 );
     vec2 inter = vec2(MAX_DIST);
 
-    vec2 temp_inter = SphIntersect( ro + sphere_pos, rd, 0.5 );
+    vec2 temp_inter = SphIntersect( ro + sphere_pos, rd, 1.0 );
 
     //temporary please change objecct placing
     vec3 n;
@@ -65,8 +66,8 @@ vec3 CastRay( vec3 ro, vec3 rd, vec3 light_pos ) {
     }
 
     vec3 box_norm;
-    vec3 boxSize = vec3( 0.6 );
-    vec3 box_pos = vec3( -5.0, 0.8, 0.0 );
+    vec3 boxSize = vec3( 1.0 );
+    vec3 box_pos = vec3( 0.0, -2.0, 0.0 );
     temp_inter = boxIntersection( ro + box_pos , rd, boxSize, box_norm);
 
     if ( (temp_inter.x > 0.0) && (temp_inter.x < inter.x) ) {
@@ -94,10 +95,11 @@ vec3 CastRay( vec3 ro, vec3 rd, vec3 light_pos ) {
 
     float light_power = 0.5; // brightness coef
     float reflection_coef = 32.0;
-    float lighting = max( 0.0, dot( n, -light_pos )) * light_power ; 
+    float minimal_brightness = 0.5; //speaks for itself 
+    float lighting = max( 0.0, dot( n, -light_pos )) * light_power + minimal_brightness ; 
     vec3 reflected = reflect( rd, n );
     float specular = pow ( max( 0.0, dot(reflected, -light_pos) ), reflection_coef ) ;
-    vec3 result = vec3(0.3, 0.6, 0.75); //put colour here, basic colour is white 
+    vec3 result = vec3(1.0, 0.6, 0.75); //put colour here, basic colour is white 
 
     return result.xyz * max ( 0.0, lighting + specular );//vec3( max( 0.0, lighting + specular ) );
 
@@ -106,11 +108,12 @@ vec3 CastRay( vec3 ro, vec3 rd, vec3 light_pos ) {
 
 void main() {
 
-    vec2 uv = ( gl_TexCoord[0].xy - vec2(0.5, 0.25) ) * u_resolution / u_resolution.y;
-    vec3 ray_origin = vec3( -5.0, 0.0, 0.0 ); //setting ray start
+    vec2 camera_place = vec2(0.5, 0.25);
+    vec2 uv = ( gl_TexCoord[0].xy - camera_place ) * u_resolution / u_resolution.y;
+    vec3 ray_origin = u_camera_pos; //setting ray start
     vec3 ray_direction = normalize( vec3(1.0, uv) ); //setting ray dir
     ray_direction.zx *= rot(-u_mouse.y);
-    ray_direction.xy *= rot(-u_mouse.x);     
+    ray_direction.xy *= rot(u_mouse.x);     
     vec3 light_pos = normalize( vec3( cos( u_time ), -0.75, sin( u_time ) ) );  // normalize( vec3( cos( u_time ), -0.75, sin( u_time ) ) ); set beautyful lighting 
     vec3 color = CastRay( ray_origin, ray_direction, light_pos );
     gl_FragColor = vec4( color, 1.1 );
