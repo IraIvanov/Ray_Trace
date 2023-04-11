@@ -7,8 +7,11 @@ uniform vec2 u_mouse;
 uniform vec3 u_camera_pos;
 uniform vec2 u_seed1;
 uniform vec2 u_seed2;
+uniform sampler2D u_sample;
+uniform float u_sample_part;
 
 const float MAX_DIST = 99999.0; 
+const float eps = 0.0001;
 /* functions borrowed from extrenal source */
 uvec4 R_STATE;
 
@@ -134,21 +137,21 @@ vec4 CastRay( inout vec3 ro, inout vec3 rd, vec3 light_pos ) {
         inter = temp_inter;
         vec3 inter_pos = ro + rd * inter.x; // coords of intersection point
         n = normalize(inter_pos - sphere_pos); // normal vector
-        col = vec4( 1.0, 0.2, 0.1, 0.005 ); //red
+        col = vec4( 1.0, 0.2, 0.1, 0.015 ); //red
 
     }
 
     //TESTING ROOM
 
     vec3 sphere_pos2 = vec3( 4.0, 0.0, 0.0 );
-    temp_inter = SphIntersect( ro + sphere_pos2, rd, 1.0 );
+    temp_inter = SphIntersect( ro + sphere_pos2, rd, 0.0 );
 
     if ( ( temp_inter.x > 0.0) && ( temp_inter.x < inter.x ) ) {
      
         inter = temp_inter;
         vec3 inter_pos = ro + rd * inter.x; // coords of intersection point
         n = normalize(inter_pos + sphere_pos2); // normal vector
-        col = vec4( 1.0, 1.0, 1.0, -1.333 ); //blue
+        col = vec4( 1.0, 1.0, 1.0, -1.5 ); //blue
 
     }
 
@@ -160,7 +163,19 @@ vec4 CastRay( inout vec3 ro, inout vec3 rd, vec3 light_pos ) {
         inter = temp_inter;
         vec3 inter_pos = ro + rd * inter.x; // coords of intersection point
         n = normalize(inter_pos + sphere_pos3); // normal vector
-        col = vec4( vec3(1.0), 0.0 ); //blue
+        col = vec4( vec3(1.0), 0.0 ); //mirror
+
+    }
+
+    vec3 sphere_pos4 = vec3( 8.0, 0.0, 0.0 );
+    temp_inter = SphIntersect( ro + sphere_pos4, rd, 0.5 );
+
+    if ( ( temp_inter.x > 0.0) && ( temp_inter.x < inter.x ) ) {
+     
+        inter = temp_inter;
+        vec3 inter_pos = ro + rd * inter.x; // coords of intersection point
+        n = normalize(inter_pos + sphere_pos4); // normal vector
+        col = vec4( vec3(1.0), -2.5 ); //glass
 
     }
 
@@ -200,19 +215,35 @@ vec4 CastRay( inout vec3 ro, inout vec3 rd, vec3 light_pos ) {
 
         inter = temp_inter;
         n = plane_norm;
-        col = vec4( 0.5 );
+        col = vec4( 0.5 ); //gray
         
     }
-    if( inter.x == MAX_DIST )
-        return vec4( -2.0 ); // no intesepction, no ray 
+
+    if( inter.x == MAX_DIST ) 
+        return vec4( GetSky( rd, light_pos ), -2.0 ); // no intesepction, no ray 
     
     if ( col.a == -2.0 ) return col;
 
     vec3 spec = reflect( rd, n );
 
+    float ref_p_pol = 1.0;
+    float tr_p_pol = 0.0;
+    float eta = 0.0;
+
+    //please change refraction
+
     if ( col.a < 0.0 ) {
 
-        if ( atan ( 1.0, 1.0 - col.a   ) >=  abs ( dot ( n, rd ) ) ) {
+        /*
+        eta = acos ( dot( rd, n )/ length( rd ) );
+        float n21 = (1.0 - col.a);
+        vec3 refracted = refract  (rd, n, 1.0 / n21 );
+        float phi = acos( dot ( refracted, n ) / length( refracted ) ) ;
+        */
+
+        float fresnel = 1.0 - abs ( dot ( -rd, n ) );
+
+        if ( random() - 0.1 < fresnel * fresnel ) {
 
             rd = spec;
             return col;
@@ -237,11 +268,15 @@ vec3 TraceRay ( vec3 ro, vec3 rd, vec3 light_pos ) {
 
     vec3 col = vec3( 1.0 );
     vec4 reflection;
-    for ( int i = 0; i < 8; i++ ) {    
+    int ref_num = 8;
+    for ( int i = 0; i < ref_num; i++ ) {    
 
         reflection = CastRay( ro, rd, light_pos);
-        if ( reflection.a == -2.0 ) return col * GetSky( rd, light_pos );
-            col *= reflection.rgb;
+        col *= reflection.rgb;
+
+        if ( reflection.a == -2.0 )
+            return col;
+            
         
     }
 
@@ -266,7 +301,27 @@ void main() {
     ray_direction.xy *= rot(u_mouse.x);     
     vec3 light_pos = normalize( vec3( 0.5 , -0.75, 0.5 ) );
     //vec3 light_pos = normalize( vec3( cos( u_time ), -0.75, sin( u_time ) ) );
-    vec3 color = TraceRay( ray_origin, ray_direction, light_pos);
+    vec3 color = vec3( 0.0 );
+
+    int samples = 4;
+
+    for ( int i = 0; i < samples; i++ )
+        color +=  TraceRay( ray_origin, ray_direction, light_pos);
+    
+    // making color real
+    
+    color /= samples ;
+
+    /*float white = 20.0;
+    float exposure = 16.0;
+
+    color *= white * exposure;
+    color = (color * (1.0 + color / white / white )) / ( 1.0 + color );
+    vec3 sample_col = texture( u_sample, gl_TexCoord[0].xy).rgb;
+    color = mix( sample_col, color, u_sample_part);*/
+
+
+    //gamma corection
     color.rgb = vec3( pow( color.r, 0.45), pow( color.g, 0.45), pow( color.b, 0.45) );
 
     gl_FragColor = vec4( color, 1.0 );
