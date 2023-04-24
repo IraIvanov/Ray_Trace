@@ -1,5 +1,4 @@
-#version 130
-
+#version 140
 
 uniform vec2 u_resolution;
 uniform float u_time;
@@ -10,9 +9,23 @@ uniform vec2 u_seed2;
 uniform sampler2D u_sample;
 uniform float u_sample_part;
 
+uniform float sun_brightness;
+
+uniform vec4 spheres_pos[20];
+uniform vec4 spheres_col[20];
+
+uniform vec3 boxes_pos[20];
+uniform vec3 boxes_size[20];
+uniform vec4 boxes_col[20];
+
+uniform vec3 planes_norm[20];
+uniform vec4 planes_col[20];
+
 const float MAX_DIST = 99999.0; 
 const float eps = 0.0001;
+
 /* functions borrowed from extrenal source */
+
 uvec4 R_STATE;
 
 uint TausStep(uint z, int S1, int S2, int S3, uint M)
@@ -69,25 +82,15 @@ vec3 GetSky( vec3 rd, vec3 light_pos ) {
 
     vec3 sky_col = vec3( 0.3, 0.6, 1.0 ); //blue skyes
     vec3 sun = vec3( 0.95, 0.9, 1.0 ); // sun
-    float sun_brightness = 0.02;
     sun *= pow ( max( 0.0, dot(rd, -light_pos) ), 256.0 );
     sky_col *= max ( 0.0, dot( -light_pos, vec3( 0.0, 0.0, -1.0 )));
     return clamp( sun + sky_col * sun_brightness, 0.0 , 1.0  );
 
 }
 
-/*vec3 getSky(vec3 rd) {
-	vec3 col = vec3(0.3, 0.6, 1.0);
-	vec3 sun = vec3(0.95, 0.9, 1.0);
-	sun *= max(0.0, pow(dot(rd, light), 256.0));
-	col *= max(0.0, dot(light, vec3(0.0, 0.0, -1.0)));
-	return clamp(sun + col * 0.01, 0.0, 1.0);
-}*/
-
-
-vec2 SphIntersect( in vec3 ro, in vec3 rd/*, in vec3 ce*/, float ra ) {   // func that seek ray intersection
+vec2 SphIntersect( in vec3 ro, in vec3 rd, float ra ) {   // func that seek ray intersection
     
-    vec3 oc = ro /*- ce*/;
+    vec3 oc = ro ;
     float b = dot( oc, rd );
     float c = dot( oc, oc ) - ra*ra;
     float h = b*b - c;
@@ -102,7 +105,7 @@ vec2 SphIntersect( in vec3 ro, in vec3 rd/*, in vec3 ce*/, float ra ) {   // fun
 
 vec2 boxIntersection( in vec3 ro, in vec3 rd, in vec3 boxSize, out vec3 outNormal ) {
     
-    vec3 m = 1.0/rd; // can precompute if traversing a set of aligned boxes
+    vec3 m = 1.0 / rd; // can precompute if traversing a set of aligned boxes
     vec3 n = m*ro;   // can precompute if traversing a set of aligned boxes
     vec3 k = abs(m)*boxSize;
     vec3 t1 = -n - k;
@@ -112,6 +115,7 @@ vec2 boxIntersection( in vec3 ro, in vec3 rd, in vec3 boxSize, out vec3 outNorma
     if( tN > tF || tF < 0.0) return vec2(-1.0); // no intersection
 	outNormal = -sign(rd) * step(t1.yzx, t1.xyz) * step(t1.zxy, t1.xyz);
     return vec2( tN, tF );
+
 }
 
 float plaIntersect( in vec3 ro, in vec3 rd, in vec4 p ) {
@@ -124,120 +128,68 @@ vec4 CastRay( inout vec3 ro, inout vec3 rd, vec3 light_pos ) {
     
     vec4 col; //color vector 
 
-    vec3 sphere_pos = vec3( 0.0, 0.0, 0.0 );
     vec2 inter = vec2(MAX_DIST);
 
-    vec2 temp_inter = SphIntersect( ro + sphere_pos, rd, 1.0 );
-
-    //temporary please change objecct placing
-    
-    vec3 n;
-
-    if ( ( temp_inter.x > 0.0) && ( temp_inter.x < inter.x ) ) {
-     
-        inter = temp_inter;
-        vec3 inter_pos = ro + rd * inter.x; // coords of intersection point
-        n = normalize(inter_pos - sphere_pos); // normal vector
-        col = vec4( 1.0, 0.2, 0.1, 1.0 ); //red
-
-    }
+    vec2 temp_inter = vec2( 0.0 );
+        
+    vec3 n = vec3( 0.0 );
 
     //TESTING ROOM
 
-    vec3 sphere_pos2 = vec3( 4.0, 0.0, 0.0 );
-    temp_inter = SphIntersect( ro + sphere_pos2, rd, 1.0 );
 
-    if ( ( temp_inter.x > 0.0) && ( temp_inter.x < inter.x ) ) {
-     
-        inter = temp_inter;
-        vec3 inter_pos = ro + rd * inter.x; // coords of intersection point
-        n = normalize(inter_pos + sphere_pos2); // normal vector
-        col = vec4( 1.0, 1.0, 1.0, -2.0 ); //light source
+    vec3 sphere_pos = vec3( 0.0 );
 
-    }
-
-    vec3 sphere_pos3 = vec3( -4.0, 0.0, 0.0 );
-    temp_inter = SphIntersect( ro + sphere_pos3, rd, 1.0 );
-
-    if ( ( temp_inter.x > 0.0) && ( temp_inter.x < inter.x ) ) {
-     
-        inter = temp_inter;
-        vec3 inter_pos = ro + rd * inter.x; // coords of intersection point
-        n = normalize(inter_pos + sphere_pos3); // normal vector
-        col = vec4( vec3(1.0), 0.0 ); //mirror
-
-    }
-
-    vec3 sphere_pos4 = vec3( 20.0, 0.0, 0.0 );
-    temp_inter = SphIntersect( ro + sphere_pos4, rd, 1.0 );
-
-    if ( ( temp_inter.x > 0.0) && ( temp_inter.x < inter.x ) ) {
-     
-        inter = temp_inter;
-        vec3 inter_pos = ro + rd * inter.x; // coords of intersection point
-        n = normalize(inter_pos + sphere_pos4); // normal vector
-        col = vec4( vec3(1.0), -1.5 ); //glass
-
-    }
-
-    vec3 sphere_pos5 = vec3( 0.0 );
-
-    int spheres_num = 10;
+    int spheres_num = 20;
 
     for ( int i = 0; i < spheres_num; i++ ) {
 
-        sphere_pos5 = vec3( 0.0, -4.0 + -2.0*i, 0.0 );
-        temp_inter = SphIntersect( ro + sphere_pos5, rd, 1 );
+        sphere_pos = (spheres_pos[i]).xyz;
+        temp_inter = SphIntersect( ro + sphere_pos, rd, (spheres_pos[i]).w );
 
         if ( ( temp_inter.x > 0.0) && ( temp_inter.x < inter.x ) ) {
         
             inter = temp_inter;
-            vec3 inter_pos = ro + rd * inter.x; // coords of intersection point
-            n = normalize(inter_pos + sphere_pos5); // normal vector
-            col = vec4( vec3(0.4, 0.5, 0.8), 0.01 * i ); //glass
+            vec3 inter_pos = ro + rd * inter.x;
+            n = normalize(inter_pos + sphere_pos);
+            col = spheres_col[i];
+
+        }
+
+    }
+    
+    vec3 box_norm = vec3( 0.0 );
+    vec3 box_size = vec3( 0.0 );
+    vec3 box_pos = vec3( 0.0 );
+
+    for ( int i = 0; i < 20; i++ ) {
+
+        box_pos = boxes_pos[i];
+        box_size = boxes_size[i];
+    
+        temp_inter = boxIntersection( ro + box_pos , rd, box_size, box_norm);
+
+        if ( (temp_inter.x > 0.0) && (temp_inter.x < inter.x) ) {
+
+            inter = temp_inter;
+            n = box_norm;
+            col = boxes_col[i];
 
         }
 
     }
 
-    //TESTING ROOM
+    for ( int i = 0; i < 20; i++ ) {
 
-    vec3 box_norm;
-    vec3 boxSize = vec3( 1.0 );
-    vec3 box_pos = vec3( 4.0, -4.0, 0.0 );
-    temp_inter = boxIntersection( ro + box_pos , rd, boxSize, box_norm);
+        temp_inter = vec2( plaIntersect( ro , rd, vec4( planes_norm[i], 1.0 ) ) );
 
-    if ( (temp_inter.x > 0.0) && (temp_inter.x < inter.x) ) {
+        if ( (temp_inter.x > 0.0) && (temp_inter.x < inter.x) ) {
 
-        inter = temp_inter;
-        n = box_norm;
-        col = vec4( 0.4, 0.6, 0.8, 0.5); //blue
+            inter = temp_inter;
+            n = planes_norm[i];
+            col = planes_col[i];
+            
+        }
 
-    }
-
-    vec3 box_norm2;
-    vec3 boxSize2 = vec3( 1.0 );
-    vec3 box_pos2 = vec3( 4.0, -10.0, 0.0 );
-    temp_inter = boxIntersection( ro + box_pos2 , rd, boxSize2, box_norm2);
-
-    if ( (temp_inter.x > 0.0) && (temp_inter.x < inter.x) ) {
-
-        inter = temp_inter;
-        n = box_norm2;
-        col = vec4( 0.6, 0.4, 0.5, 0.8 ); //purple
-
-    }
-
-    vec3 plane_norm = vec3( 0.0, 0.0, -1.0 );
-
-    temp_inter = vec2( plaIntersect( ro , rd, vec4( plane_norm, 1.0 ) ) );
-
-    if ( (temp_inter.x > 0.0) && (temp_inter.x < inter.x) ) {
-
-        inter = temp_inter;
-        n = plane_norm;
-        col = vec4( 0.5 ); //gray
-        
     }
 
     if( inter.x == MAX_DIST ) 
@@ -254,13 +206,6 @@ vec4 CastRay( inout vec3 ro, inout vec3 rd, vec3 light_pos ) {
     //please change refraction
 
     if ( col.a < 0.0 ) {
-
-        /*
-        eta = acos ( dot( rd, n )/ length( rd ) );
-        float n21 = (1.0 - col.a);
-        vec3 refracted = refract  (rd, n, 1.0 / n21 );
-        float phi = acos( dot ( refracted, n ) / length( refracted ) ) ;
-        */
 
         float fresnel = 1.0 - abs ( dot ( -rd, n ) );
 
@@ -289,7 +234,7 @@ vec3 TraceRay ( vec3 ro, vec3 rd, vec3 light_pos ) {
 
     vec3 col = vec3( 1.0 );
     vec4 reflection;
-    int ref_num = 8;
+    int ref_num = 16;
     for ( int i = 0; i < ref_num; i++ ) {    
 
         reflection = CastRay( ro, rd, light_pos);
@@ -320,10 +265,8 @@ void main() {
     vec3 ray_direction = normalize( vec3(1.0, uv) ); //setting ray dir
     ray_direction.zx *= rot(-u_mouse.y);
     ray_direction.xy *= rot(u_mouse.x);     
-    vec3 light_pos = normalize( vec3( 0.5 , -0.75, 0.5 ) );
-    //vec3 light_pos = normalize( vec3( cos( u_time ), -0.75, sin( u_time ) ) );
+    vec3 light_pos = normalize( vec3( 0.5 , -0.75, 0.8 ) );
     vec3 color = vec3( 0.0 );
-
     int samples = 4;
 
     for ( int i = 0; i < samples; i++ )
@@ -340,10 +283,6 @@ void main() {
     color = (color * (1.0 + color / white / white )) / ( 1.0 + color );
     vec3 sample_col = texture( u_sample, gl_TexCoord[0].xy).rgb;
     color = mix( sample_col, color, u_sample_part);
-
-
-    //gamma corection
-    //color.rgb = vec3( pow( color.r, 0.45), pow( color.g, 0.45), pow( color.b, 0.45) );
 
     gl_FragColor = vec4( color, 1.0 );
 

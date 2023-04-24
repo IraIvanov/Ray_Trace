@@ -46,13 +46,83 @@ int main() {
     //bool ControlKeys[CONTROL_KEYS_NUM] = { false };
 
     // setting random 
+
     std::random_device rd;
     std::mt19937 e2(rd());
 	std::uniform_real_distribution<> dist(0.0f, 1.0f);
+
     //window.setMouseCursorVisible( false );
     
+    // setting scene
+    
+    float sun_brightness = 0.02;
+
+    sf::Glsl::Vec4 spheres_pos[20];
+    sf::Glsl::Vec4 spheres_col[20];
+
+
+    for ( int i = 0; i < 10; i++ ) {
+
+        spheres_pos[i] = sf::Glsl::Vec4( 0.f, -4.f + -2.f*i, 0.f , 1.f );
+        spheres_col[i] = sf::Glsl::Vec4( 0.4, 0.5, 0.8, 0.1 * i );
+
+    }
+
+    spheres_pos[10] = sf::Glsl::Vec4( 0.f, 0.f, 0.f, 1.f );
+    spheres_col[10] = sf::Glsl::Vec4( 1.f, 0.2, 0.1, 1.f );
+    spheres_pos[11] = sf::Glsl::Vec4( 4.f, 0.f, 0.f, 1.f );
+    spheres_col[11] = sf::Glsl::Vec4( 1.f, 1.f, 1.f, -2.f );
+    spheres_pos[12] = sf::Glsl::Vec4( -4.f, 0.f, 0.f, 1.f );
+    spheres_col[12] = sf::Glsl::Vec4( 1.f, 1.f, 1.f, 0.f );
+    spheres_pos[13] = sf::Glsl::Vec4( 10.f, 0.f, 0.f, 1.f );
+    spheres_col[13] = sf::Glsl::Vec4( 1.f, 1.f, 1.f, -1.5 );
+
+    for ( int i = 14; i < 20; i++ ) {
+
+        spheres_pos[i] = sf::Glsl::Vec4( 0.f, 0.f, 0.f , 0.f );
+        spheres_col[i] = sf::Glsl::Vec4( 0.f, 0.f, 0.f, 0.f );
+
+    }
+
+
+    sf::Glsl::Vec3 boxes_pos[20];
+    sf::Glsl::Vec3 boxes_size[20];
+    sf::Glsl::Vec4 boxes_col[20];
+
+    for ( int i = 0; i < 20; i++ ) {
+
+        boxes_pos[i] = sf::Glsl::Vec3( 0.f, 0.f, 0.f);
+        boxes_col[i] = sf::Glsl::Vec4( 0.f, 0.f, 0.f, 0.f );
+        boxes_size[i] = sf::Glsl::Vec3( 0.f, 0.f, 0.f );
+
+    }
+
+    boxes_pos[0] = sf::Glsl::Vec3( 4.f, -4.f, 0.f );
+    boxes_pos[1] = sf::Glsl::Vec3( 4.f, -10.f, 0.f );
+
+    boxes_size[0] = sf::Glsl::Vec3( 1.f, 1.f, 1.f );
+    boxes_size[1] = sf::Glsl::Vec3( 1.f, 1.f, 1.f );
+
+    boxes_col[0] = sf::Glsl::Vec4( 0.4, 0.6, 0.8, 1.0 );
+    boxes_col[1] = sf::Glsl::Vec4( 0.6, 0.4, 0.5, 0.8 );
+
+    sf::Glsl::Vec3 planes_norm[20];
+    sf::Glsl::Vec4 planes_col[20];
+
+    for ( int i = 0; i < 20; i++ ) {
+
+        planes_norm[i] = sf::Glsl::Vec3( 0.f, 0.f, 0.f);
+        planes_col[i] = sf::Glsl::Vec4( 0.f, 0.f, 0.f, 0.f );
+
+    }
+
+    planes_norm[0] = sf::Glsl::Vec3( 0.f, 0.f, -1.f );
+    planes_col[0] = sf::Glsl::Vec4( 0.5, 0.5, 0.5, 1.f );
+
+
     sf::Vector3f camera_positoin( 0.f, 0.f, 0.f );
 
+    sf::Mouse::setPosition( sf::Vector2i( WIDTH/2, HIGHT/2 ), window );
     window.setActive(true);
     while( window.isOpen() ) { // main loop
 
@@ -75,8 +145,10 @@ int main() {
                     mouse_x += mouse_move_x;
                     mouse_y += mouse_move_y;
                     mouse_pos = current_mouse_pos;
+                    
                     if ( mouse_move_x != 0 || mouse_move_y != 0 )
                         FrameStill = 1;
+
                     //sf::Mouse::setPosition( sf::Vector2i( WIDTH/2, HIGHT/2 ), window ); //bugs 
                     break;
                 case ( sf::Event::KeyPressed ):
@@ -136,6 +208,7 @@ int main() {
             }
 
         }
+
         float res_mouse_x =  float(mouse_x) / WIDTH - 0.5f; 
         float res_mouse_y =  float(mouse_y) / HIGHT - 0.5f;
         window.setActive();
@@ -148,6 +221,14 @@ int main() {
         shader.setUniform("u_sample_part", 1.0f / FrameStill) ;
         shader.setUniform("u_seed1", sf::Vector2f((float)dist(e2), (float)dist(e2)) * 999.0f);
 		shader.setUniform("u_seed2", sf::Vector2f((float)dist(e2), (float)dist(e2)) * 999.0f);
+        shader.setUniform("sun_brightness", sun_brightness );
+        shader.setUniformArray( "spheres_pos", spheres_pos, 20 );
+        shader.setUniformArray( "spheres_col", spheres_col, 20 );
+        shader.setUniformArray( "boxes_pos", boxes_pos, 20 );
+        shader.setUniformArray( "boxes_col", boxes_col, 20 );
+        shader.setUniformArray( "boxes_size", boxes_size, 20 );
+        shader.setUniformArray( "planes_norm", planes_norm, 20 );
+        shader.setUniformArray( "planes_col", planes_col, 20 );
 
         if ( FrameStill % 2 == 1 ) {
 
