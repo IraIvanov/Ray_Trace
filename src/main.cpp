@@ -11,7 +11,7 @@ int main() {
     window.setVerticalSyncEnabled( false ); // Vsync Disabled
 
     sf::Shader shader;
-    shader.loadFromFile( "../include/raytracing.frag", sf::Shader::Fragment );
+    shader.loadFromFile( "raytracing.frag", sf::Shader::Fragment );
     shader.setUniform( "u_resolution", sf::Vector2f( WIDTH, HIGHT ) ); 
  
     sf::RenderTexture OutTexture;

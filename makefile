@@ -15,7 +15,7 @@ CC = g++
 
 DFLAGS = -g -ggdb3 -Wall -Werror -Wpedantic -Wextra -fsanitize=undefined,address,alignment,bool,bounds,enum,float-cast-overflow,float-divide-by-zero,integer-divide-by-zero,leak,nonnull-attribute,null,object-size,return,returns-nonnull-attribute,shift,signed-integer-overflow,undefined,unreachable,vla-bound,vptr
 
-FLAGS = sfml-app -lsfml-graphics -lsfml-window -lsfml-system
+FLAGS = -lsfml-graphics -lsfml-window -lsfml-system
 
 PREF_SRC = ./src/
 PREF_OBJ = ./obj/
@@ -24,7 +24,7 @@ SRC = $(wildcard $(PREF_SRC)*.cpp)
 OBJ = $(patsubst $(PREF_SRC)%.cpp, $(PREF_OBJ)%.o, $(SRC))
 
 $(TARGET) : $(OBJ)
-	$(CC) $(OBJ) -o $(FLAGS) $(DFLAGS) 
+	$(CC) $(OBJ) $(FLAGS) $(DFLAGS) -o  $(TARGET)
 
 $(PREF_OBJ)%.o : $(PREF_SRC)%.cpp
 	$(CC) -c $< -o $@
