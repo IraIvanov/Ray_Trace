@@ -1,18 +1,17 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/OpenGL.hpp>
 #include <iostream>
-#include "config.hpp"
+#include "../include/config.hpp"
 #include <cmath>
 #include <random>
 
 int main() {
-    
     sf::RenderWindow window ( sf::VideoMode( WIDTH, HIGHT ), "test window");
     window.setFramerateLimit(MAX_FPS);
     window.setVerticalSyncEnabled( false ); // Vsync Disabled
 
     sf::Shader shader;
-    shader.loadFromFile( "raytracing.frag", sf::Shader::Fragment );
+    shader.loadFromFile( "../include/raytracing.frag", sf::Shader::Fragment );
     shader.setUniform( "u_resolution", sf::Vector2f( WIDTH, HIGHT ) ); 
  
     sf::RenderTexture OutTexture;
