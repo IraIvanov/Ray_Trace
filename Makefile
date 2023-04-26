@@ -24,7 +24,7 @@ SRC = $(wildcard $(PREF_SRC)*.cpp)
 OBJ = $(patsubst $(PREF_SRC)%.cpp, $(PREF_OBJ)%.o, $(SRC))
 
 $(TARGET) : $(OBJ)
-	$(CC) $(OBJ) $(FLAGS) $(DFLAGS) -o  $(TARGET)
+	$(CC) $(OBJ) $(FLAGS) $(DFLAGS) -o $(TARGET)
 
 $(PREF_OBJ)%.o : $(PREF_SRC)%.cpp
 	$(CC) -c $< -o $@
