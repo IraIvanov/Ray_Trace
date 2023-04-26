@@ -12,11 +12,12 @@ int main() {
     window.setVerticalSyncEnabled( false ); // Vsync Disabled
 
     sf::Shader shader;
+
     shader.loadFromFile( "raytracing.frag", sf::Shader::Fragment );
     shader.setUniform( "u_resolution", sf::Vector2f( WIDTH, HIGHT ) ); 
- 
+
     sf::RenderTexture OutTexture;
-    OutTexture.create( WIDTH, HIGHT); // using WIDTH*2 in order to fit screan size, 0.6 fixing resolution  
+    OutTexture.create( WIDTH, HIGHT);
     sf::Sprite OutSprite = sf::Sprite(OutTexture.getTexture());
     sf::Sprite OutSpriteFlipped = sf::Sprite(OutTexture.getTexture());
     OutSpriteFlipped.setScale( 1, -1 );
@@ -42,6 +43,7 @@ int main() {
     int mouse_move_x = 0;
     int mouse_move_y = 0;
 
+    bool switcher = true;
 
     //bool ControlKeys[CONTROL_KEYS_NUM] = { false };
 
@@ -57,9 +59,10 @@ int main() {
     
     float sun_brightness = 0.02;
 
+    sf::Glsl::Vec3 ulight_pos = sf::Glsl::Vec3( 0.4f, -0.75f, -0.8f );
+
     sf::Glsl::Vec4 spheres_pos[20];
     sf::Glsl::Vec4 spheres_col[20];
-
 
     for ( int i = 0; i < 10; i++ ) {
 
@@ -68,7 +71,7 @@ int main() {
 
     }
 
-    spheres_pos[10] = sf::Glsl::Vec4( 0.f, 0.f, 0.f, 1.f );
+    spheres_pos[10] = sf::Glsl::Vec4( 4.f, -4.f, 2.f, 0.75f );
     spheres_col[10] = sf::Glsl::Vec4( 1.f, 0.2, 0.1, 1.f );
     spheres_pos[11] = sf::Glsl::Vec4( 4.f, 0.f, 0.f, 1.f );
     spheres_col[11] = sf::Glsl::Vec4( 1.f, 1.f, 1.f, -2.f );
@@ -150,7 +153,9 @@ int main() {
                         FrameStill = 1;
 
                     //sf::Mouse::setPosition( sf::Vector2i( WIDTH/2, HIGHT/2 ), window ); //bugs 
+                    
                     break;
+                
                 case ( sf::Event::KeyPressed ):
 
                     switch( event.key.code ) {
@@ -197,6 +202,25 @@ int main() {
 
                             break;
 
+                        case ( sf::Keyboard::LControl ):
+
+                            if ( switcher == true ) {
+
+                                shader.loadFromFile( "raycast.frag", sf::Shader::Fragment );
+                                shader.setUniform( "u_resolution", sf::Vector2f( WIDTH, HIGHT ) );
+                                switcher = false;
+
+                            } else {
+
+                                    shader.loadFromFile( "raytracing.frag", sf::Shader::Fragment );
+                                    shader.setUniform( "u_resolution", sf::Vector2f( WIDTH, HIGHT ) ); 
+                                    switcher = true;
+                                    FrameStill = 1;
+
+                            }
+
+                            break;
+
                         default:
                             break;
                     }
@@ -229,26 +253,30 @@ int main() {
         shader.setUniformArray( "boxes_size", boxes_size, 20 );
         shader.setUniformArray( "planes_norm", planes_norm, 20 );
         shader.setUniformArray( "planes_col", planes_col, 20 );
+        shader.setUniform( "ulight_pos", ulight_pos );
 
-        if ( FrameStill % 2 == 1 ) {
+        if ( switcher == true ) {
 
-            shader.setUniform("u_sample", OutTexture.getTexture() );
-            FinalTexture.draw( OutSpriteFlipped, &shader );
-            window.draw( FinalSprite );
+            if ( FrameStill % 2 == 1 ) {
+
+                shader.setUniform("u_sample", OutTexture.getTexture() );
+                FinalTexture.draw( OutSpriteFlipped, &shader );
+                window.draw( FinalSprite );
+
+            } else {
+
+                shader.setUniform("u_sample", FinalTexture.getTexture() );
+                OutTexture.draw( OutSpriteFlipped, &shader );
+                window.draw( OutSprite );
+
+            }
 
         } else {
 
-            shader.setUniform("u_sample", FinalTexture.getTexture() );
-            OutTexture.draw( OutSpriteFlipped, &shader );
-            window.draw( OutSprite );
+            shader.setUniform("u_sample", OutTexture.getTexture() );
+            window.draw(OutSprite, &shader);
 
         }
-
-
-		//window.draw(OutSprite, &shader);
-        /*
-            Shader goes here
-        */
 
         window.display();
         FrameStill++;

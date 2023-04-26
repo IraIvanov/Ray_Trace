@@ -1,9 +1,9 @@
 #version 140
 
 uniform vec2 u_resolution;
-uniform float u_time;
 uniform vec2 u_mouse;
 uniform vec3 u_camera_pos;
+
 uniform vec2 u_seed1;
 uniform vec2 u_seed2;
 uniform sampler2D u_sample;
@@ -24,55 +24,6 @@ uniform vec3 planes_norm[20];
 uniform vec4 planes_col[20];
 
 const float MAX_DIST = 99999.0; 
-const float eps = 0.0001;
-
-/* functions borrowed from extrenal source */
-
-uvec4 R_STATE;
-
-uint TausStep(uint z, int S1, int S2, int S3, uint M)
-{
-	uint b = (((z << S1) ^ z) >> S2);
-	return (((z & M) << S3) ^ b);	
-}
-
-uint LCGStep(uint z, uint A, uint C)
-{
-	return (A * z + C);	
-}
-
-vec2 hash22(vec2 p)
-{
-	p += u_seed1.x;
-	vec3 p3 = fract(vec3(p.xyx) * vec3(.1031, .1030, .0973));
-	p3 += dot(p3, p3.yzx+33.33);
-	return fract((p3.xx+p3.yz)*p3.zy);
-}
-
-float random()
-{
-	R_STATE.x = TausStep(R_STATE.x, 13, 19, 12, uint(4294967294));
-	R_STATE.y = TausStep(R_STATE.y, 2, 25, 4, uint(4294967288));
-	R_STATE.z = TausStep(R_STATE.z, 3, 11, 17, uint(4294967280));
-	R_STATE.w = LCGStep(R_STATE.w, uint(1664525), uint(1013904223));
-	return 2.3283064365387e-10 * float((R_STATE.x ^ R_STATE.y ^ R_STATE.z ^ R_STATE.w));
-}
-
-vec3 randomOnSphere() {
-	vec3 rand = vec3(random(), random(), random());
-	float theta = rand.x * 2.0 * 3.14159265;
-	float v = rand.y;
-	float phi = acos(2.0 * v - 1.0);
-	float r = pow(rand.z, 1.0 / 3.0);
-	float x = r * sin(phi) * cos(theta);
-	float y = r * sin(phi) * sin(theta);
-	float z = r * cos(phi);
-	return vec3(x, y, z);
-}
-
-
-/* end of borrowed functions */
-
 
 mat2 rot( float a ) {
 
@@ -84,9 +35,8 @@ vec3 GetSky( vec3 rd, vec3 light_pos ) {
 
     vec3 sky_col = vec3( 0.3, 0.6, 1.0 ); //blue skyes
     vec3 sun = vec3( 0.95, 0.9, 1.0 ); // sun
-    sun *= pow ( max( 0.0, dot(rd, -light_pos) ), 256.0 );
-    sky_col *= max ( 0.0, dot( -light_pos, vec3( 0.0, 0.0, -1.0 )));
-    return clamp( sun + sky_col * sun_brightness, 0.0 , 1.0  );
+    sun *= pow ( max( 0.0, dot(rd, -light_pos) ), 32.0 );
+    return clamp( sun + sky_col*sun_brightness, 0.0 , 1.0  );
 
 }
 
@@ -126,8 +76,8 @@ float plaIntersect( in vec3 ro, in vec3 rd, in vec4 p ) {
 
 
 
-vec4 CastRay( inout vec3 ro, inout vec3 rd, vec3 light_pos ) {
-    
+vec3 CastRay( inout vec3 ro, inout vec3 rd, vec3 light_pos ) {
+
     vec4 col; //color vector 
 
     vec2 inter = vec2(MAX_DIST);
@@ -194,61 +144,34 @@ vec4 CastRay( inout vec3 ro, inout vec3 rd, vec3 light_pos ) {
 
     }
 
-    if( inter.x == MAX_DIST ) 
-        return vec4( GetSky( rd, light_pos ), -2.0 ); // no intesepction, no ray 
-    
-    if ( col.a == -2.0 ) return col;  // it's a light source 
+    if( inter.x == MAX_DIST )
+        return vec3( -1.0 ); // no intesepction, no ray 
 
-    vec3 spec = reflect( rd, n );
 
-    float ref_p_pol = 1.0;
-    float tr_p_pol = 0.0;
-    float eta = 0.0;
-
-    //please change refraction
-
-    if ( col.a < 0.0 ) {
-
-        float fresnel = 1.0 - abs ( dot ( -rd, n ) );
-
-        if ( random() - 0.1 < fresnel * fresnel ) {
-
-            rd = spec;
-            return col;
-
-        }
-
-        ro += rd * ( inter.y + 0.001 );
-        rd = refract( rd, n, 1.0 / (1.0 - col.a) );
-        return col;
-
-    }
-    
-    vec3 rand = randomOnSphere();
-    vec3 diff = normalize ( rand * dot( rand, n ) );
+    float light_power = 0.5; // brightness coef
+    float reflection_coef = 32.0;
+    float minimal_brightness = 0.5; //speaks for itself 
+    float lighting = dot( n, -light_pos ) * light_power + minimal_brightness ; 
+    vec3 reflected = reflect( rd, n );
+    float specular = pow ( max( 0.0, dot(reflected, -light_pos) ), reflection_coef ) ;
+    col.xyz *= mix(lighting, specular, 0.5 );
     ro += rd * (inter.x - 0.001 );
-    rd = mix ( spec, diff, col.a );
-    return col;
+    rd = n;
+    return col.xyz;
 
 }
 
 vec3 TraceRay ( vec3 ro, vec3 rd, vec3 light_pos ) {
 
-    vec3 col = vec3( 1.0 );
-    vec4 reflection;
-    int ref_num = 16;
-    for ( int i = 0; i < ref_num; i++ ) {    
+    vec3 col = CastRay( ro, rd, light_pos );
 
-        reflection = CastRay( ro, rd, light_pos);
-        col *= reflection.rgb;
-
-        if ( reflection.a == -2.0 )
-            return col;
-            
-        
-    }
-
-    return vec3( 0.0 );
+        if ( col.x == -1.0 ) return GetSky( rd, light_pos );
+    
+        vec3 light = -light_pos;
+        if ( dot(rd, light ) > 0.0 ) {
+            if ( ((CastRay( ro, light, light_pos )).x) != -1.0 ) col *= 0.5;
+        }
+    return col;
 
 }
 
@@ -256,37 +179,14 @@ void main() {
 
     vec2 camera_place = vec2(0.5, 0.25);
     vec2 uv = ( gl_TexCoord[0].xy - camera_place ) * u_resolution / u_resolution.y;
-    vec2 uvRes = hash22(uv + 1.0) * u_resolution + u_resolution;
-
-    R_STATE.x = uint(u_seed1.x + uvRes.x);
-	R_STATE.y = uint(u_seed1.y + uvRes.x);
-	R_STATE.z = uint(u_seed2.x + uvRes.y);
-	R_STATE.w = uint(u_seed2.y + uvRes.y);
-
     vec3 ray_origin = u_camera_pos; //setting ray start
     vec3 ray_direction = normalize( vec3(1.0, uv) ); //setting ray dir
     ray_direction.zx *= rot(-u_mouse.y);
     ray_direction.xy *= rot(u_mouse.x);     
     vec3 light_pos = normalize( ulight_pos );
-    vec3 color = vec3( 0.0 );
-    int samples = 4;
-
-    for ( int i = 0; i < samples; i++ )
-        color +=  TraceRay( ray_origin, ray_direction, light_pos);
-    
-    // making color real
-    
-    color /= samples ;
-
-    float white = 20.0;
-    float exposure = 16.0;
-
-    color *= white * exposure;
-    color = (color * (1.0 + color / white / white )) / ( 1.0 + color );
-    vec3 sample_col = texture( u_sample, gl_TexCoord[0].xy).rgb;
-    color = mix( sample_col, color, u_sample_part);
+    vec3 color = TraceRay( ray_origin, ray_direction, light_pos);
+    color.rgb = vec3( pow( color.r, 0.45), pow( color.g, 0.45), pow( color.b, 0.45) );
 
     gl_FragColor = vec4( color, 1.0 );
 
 }
-
