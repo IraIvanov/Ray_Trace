@@ -9,6 +9,9 @@
 #define MOVING_KEYS 6
 #define WALKING_PACE 0.1f
 
+#define DEFAULT_SIZE 15
+#define PLANES_SIZE 5
+
 enum Control_Keys{
 
     W = 0,

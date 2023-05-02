@@ -1,9 +1,12 @@
 #version 140
 
+#define DEFAULT_SIZE 15
+#define PLANES_SIZE 5
+
 uniform vec2 u_resolution;
+uniform float u_time;
 uniform vec2 u_mouse;
 uniform vec3 u_camera_pos;
-
 uniform vec2 u_seed1;
 uniform vec2 u_seed2;
 uniform sampler2D u_sample;
@@ -13,17 +16,22 @@ uniform float sun_brightness;
 
 uniform vec3 ulight_pos;
 
-uniform vec4 spheres_pos[20];
-uniform vec4 spheres_col[20];
+uniform vec4 spheres_pos[DEFAULT_SIZE];
+uniform vec4 spheres_col[DEFAULT_SIZE];
 
-uniform vec3 boxes_pos[20];
-uniform vec3 boxes_size[20];
-uniform vec4 boxes_col[20];
+uniform vec3 boxes_pos[DEFAULT_SIZE];
+uniform vec3 boxes_size[DEFAULT_SIZE];
+uniform vec4 boxes_col[DEFAULT_SIZE];
 
-uniform vec3 planes_norm[20];
-uniform vec4 planes_col[20];
+uniform vec3 planes_norm[PLANES_SIZE];
+uniform vec4 planes_col[PLANES_SIZE];
 
-const float MAX_DIST = 99999.0; 
+uniform vec4 cones_up_point[DEFAULT_SIZE];
+uniform vec4 cones_down_point[DEFAULT_SIZE];
+uniform vec4 cones_col[DEFAULT_SIZE];
+
+const float MAX_DIST = 99999.0;
+const float eps = 0.0001; 
 
 mat2 rot( float a ) {
 
@@ -75,6 +83,45 @@ float plaIntersect( in vec3 ro, in vec3 rd, in vec4 p ) {
 }
 
 
+vec4 coneIntersect( in vec3  ro, in vec3  rd, in vec3  pa, in vec3  pb, in float ra, in float rb )
+{
+    vec3  ba = pb - pa;
+    vec3  oa = ro - pa;
+    vec3  ob = ro - pb;
+    float m0 = dot(ba,ba);
+    float m1 = dot(oa,ba);
+    float m2 = dot(rd,ba);
+    float m3 = dot(rd,oa);
+    float m5 = dot(oa,oa);
+    float m9 = dot(ob,ba); 
+    
+    // caps
+    if( m1<0.0 )
+    {
+        if( dot(oa*m2-rd*m1, oa*m2-rd*m1)<(ra*ra*m2*m2) ) // delayed division
+            return vec4(-m1/m2,-ba*inversesqrt(m0));
+    }
+    else if( m9>0.0 )
+    {
+    	float t = -m9/m2;                     // NOT delayed division
+        if( dot(ob+rd*t, ob+rd*t)<(rb*rb) )
+            return vec4(t,ba*inversesqrt(m0));
+    }
+    
+    // body
+    float rr = ra - rb;
+    float hy = m0 + rr*rr;
+    float k2 = m0*m0    - m2*m2*hy;
+    float k1 = m0*m0*m3 - m1*m2*hy + m0*ra*(rr*m2*1.0        );
+    float k0 = m0*m0*m5 - m1*m1*hy + m0*ra*(rr*m1*2.0 - m0*ra);
+    float h = k1*k1 - k2*k0;
+    if( h<0.0 ) return vec4(-1.0); //no intersection
+    float t = (-k1-sqrt(h))/k2;
+    float y = m1 + t*m2;
+    if( y<0.0 || y>m0 ) return vec4(-1.0); //no intersection
+    return vec4(t, normalize(m0*(m0*(oa+t*rd)+rr*ba*ra)-ba*hy*y));
+}
+
 
 vec3 CastRay( inout vec3 ro, inout vec3 rd, vec3 light_pos ) {
 
@@ -91,9 +138,9 @@ vec3 CastRay( inout vec3 ro, inout vec3 rd, vec3 light_pos ) {
 
     vec3 sphere_pos = vec3( 0.0 );
 
-    int spheres_num = 20;
+    for ( int i = 0; i < DEFAULT_SIZE; i++ ) {
 
-    for ( int i = 0; i < spheres_num; i++ ) {
+        if ( spheres_pos[i].w < eps ) continue;
 
         sphere_pos = (spheres_pos[i]).xyz;
         temp_inter = SphIntersect( ro + sphere_pos, rd, (spheres_pos[i]).w );
@@ -113,11 +160,13 @@ vec3 CastRay( inout vec3 ro, inout vec3 rd, vec3 light_pos ) {
     vec3 box_size = vec3( 0.0 );
     vec3 box_pos = vec3( 0.0 );
 
-    for ( int i = 0; i < 20; i++ ) {
+    for ( int i = 0; i < DEFAULT_SIZE; i++ ) {
+
+        if ( boxes_size[i].x < eps && boxes_size[i].y < eps && boxes_size[i].z < eps ) continue;
 
         box_pos = boxes_pos[i];
         box_size = boxes_size[i];
-    
+
         temp_inter = boxIntersection( ro + box_pos , rd, box_size, box_norm);
 
         if ( (temp_inter.x > 0.0) && (temp_inter.x < inter.x) ) {
@@ -130,7 +179,35 @@ vec3 CastRay( inout vec3 ro, inout vec3 rd, vec3 light_pos ) {
 
     }
 
-    for ( int i = 0; i < 20; i++ ) {
+    vec3 pa = vec3( 0.0 );
+    vec3 pb = vec3( 0.0 );
+    float ra = 0.0;
+    float rb = 0.0;
+
+    for ( int i = 0; i < DEFAULT_SIZE; i++ ) {
+
+        if ( cones_up_point[i].w < eps && cones_down_point[i].w < eps ) continue;
+
+        pa = cones_down_point[i].xyz;
+        pb = cones_up_point[i].xyz;
+        ra = cones_down_point[i].w;
+        rb = cones_up_point[i].w;
+
+        temp_inter = vec2(coneIntersect( ro, rd, pa, pb, ra, rb));
+
+        if ( (temp_inter.x > 0.0) && (temp_inter.x < inter.x) ) {
+
+            inter = temp_inter;
+            n = normalize( coneIntersect( ro, rd, pa, pb, ra, rb).yzw);
+            col = cones_col[i];
+
+        }
+
+    }
+
+    for ( int i = 0; i < PLANES_SIZE; i++ ) {
+
+        if ( planes_norm[i].x < eps &&  planes_norm[i].y < eps &&  planes_norm[i].z < eps )
 
         temp_inter = vec2( plaIntersect( ro , rd, vec4( planes_norm[i], 1.0 ) ) );
 

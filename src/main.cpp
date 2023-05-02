@@ -59,10 +59,10 @@ int main() {
     
     float sun_brightness = 0.02;
 
-    sf::Glsl::Vec3 ulight_pos = sf::Glsl::Vec3( 0.4f, -0.75f, -0.8f );
+    sf::Glsl::Vec3 ulight_pos = sf::Glsl::Vec3( 0.4f, -0.75f, 0.8f );
 
-    sf::Glsl::Vec4 spheres_pos[20];
-    sf::Glsl::Vec4 spheres_col[20];
+    sf::Glsl::Vec4 spheres_pos[DEFAULT_SIZE];
+    sf::Glsl::Vec4 spheres_col[DEFAULT_SIZE];
 
     for ( int i = 0; i < 10; i++ ) {
 
@@ -80,7 +80,7 @@ int main() {
     spheres_pos[13] = sf::Glsl::Vec4( 10.f, 0.f, 0.f, 1.f );
     spheres_col[13] = sf::Glsl::Vec4( 1.f, 1.f, 1.f, -1.5 );
 
-    for ( int i = 14; i < 20; i++ ) {
+    for ( int i = 14; i < DEFAULT_SIZE; i++ ) {
 
         spheres_pos[i] = sf::Glsl::Vec4( 0.f, 0.f, 0.f , 0.f );
         spheres_col[i] = sf::Glsl::Vec4( 0.f, 0.f, 0.f, 0.f );
@@ -88,11 +88,11 @@ int main() {
     }
 
 
-    sf::Glsl::Vec3 boxes_pos[20];
-    sf::Glsl::Vec3 boxes_size[20];
-    sf::Glsl::Vec4 boxes_col[20];
+    sf::Glsl::Vec3 boxes_pos[DEFAULT_SIZE];
+    sf::Glsl::Vec3 boxes_size[DEFAULT_SIZE];
+    sf::Glsl::Vec4 boxes_col[DEFAULT_SIZE];
 
-    for ( int i = 0; i < 20; i++ ) {
+    for ( int i = 0; i < DEFAULT_SIZE; i++ ) {
 
         boxes_pos[i] = sf::Glsl::Vec3( 0.f, 0.f, 0.f);
         boxes_col[i] = sf::Glsl::Vec4( 0.f, 0.f, 0.f, 0.f );
@@ -106,13 +106,13 @@ int main() {
     boxes_size[0] = sf::Glsl::Vec3( 1.f, 1.f, 1.f );
     boxes_size[1] = sf::Glsl::Vec3( 1.f, 1.f, 1.f );
 
-    boxes_col[0] = sf::Glsl::Vec4( 0.4, 0.6, 0.8, 1.0 );
+    boxes_col[0] = sf::Glsl::Vec4( 0.4, 0.6, 0.8, 1.f );
     boxes_col[1] = sf::Glsl::Vec4( 0.6, 0.4, 0.5, 0.8 );
 
-    sf::Glsl::Vec3 planes_norm[20];
-    sf::Glsl::Vec4 planes_col[20];
+    sf::Glsl::Vec3 planes_norm[PLANES_SIZE];
+    sf::Glsl::Vec4 planes_col[PLANES_SIZE];
 
-    for ( int i = 0; i < 20; i++ ) {
+    for ( int i = 0; i < PLANES_SIZE; i++ ) {
 
         planes_norm[i] = sf::Glsl::Vec3( 0.f, 0.f, 0.f);
         planes_col[i] = sf::Glsl::Vec4( 0.f, 0.f, 0.f, 0.f );
@@ -121,6 +121,22 @@ int main() {
 
     planes_norm[0] = sf::Glsl::Vec3( 0.f, 0.f, -1.f );
     planes_col[0] = sf::Glsl::Vec4( 0.5, 0.5, 0.5, 1.f );
+    
+    sf::Glsl::Vec4 cones_down_point[DEFAULT_SIZE];
+    sf::Glsl::Vec4 cones_up_point[DEFAULT_SIZE];
+    sf::Glsl::Vec4 cones_col[DEFAULT_SIZE];
+
+    for ( int i = 0; i < DEFAULT_SIZE; i++ ) {
+
+        cones_down_point[i] = sf::Glsl::Vec4( 0.f, 0.f, 0.f, 0.f );
+        cones_up_point[i] = sf::Glsl::Vec4( 0.f, 0.f, 0.f, 0.f );
+        cones_col[i] = sf::Glsl::Vec4( 0.f, 0.f, 0.f, 0.f );
+
+    }
+
+    cones_down_point[0] = sf::Glsl::Vec4( 4.f, 4.f, 1.f, 1.f );
+    cones_up_point[0] = sf::Glsl::Vec4( 4.f, 4.f, -2.f, 0.f );
+    cones_col[0] = sf::Glsl::Vec4( 1.f, 0.4, 0.6, 0.f );
 
 
     sf::Vector3f camera_positoin( 0.f, 0.f, 0.f );
@@ -246,13 +262,16 @@ int main() {
         shader.setUniform("u_seed1", sf::Vector2f((float)dist(e2), (float)dist(e2)) * 999.0f);
 		shader.setUniform("u_seed2", sf::Vector2f((float)dist(e2), (float)dist(e2)) * 999.0f);
         shader.setUniform("sun_brightness", sun_brightness );
-        shader.setUniformArray( "spheres_pos", spheres_pos, 20 );
-        shader.setUniformArray( "spheres_col", spheres_col, 20 );
-        shader.setUniformArray( "boxes_pos", boxes_pos, 20 );
-        shader.setUniformArray( "boxes_col", boxes_col, 20 );
-        shader.setUniformArray( "boxes_size", boxes_size, 20 );
-        shader.setUniformArray( "planes_norm", planes_norm, 20 );
-        shader.setUniformArray( "planes_col", planes_col, 20 );
+        shader.setUniformArray( "spheres_pos", spheres_pos, DEFAULT_SIZE );
+        shader.setUniformArray( "spheres_col", spheres_col, DEFAULT_SIZE );
+        shader.setUniformArray( "boxes_pos", boxes_pos, DEFAULT_SIZE );
+        shader.setUniformArray( "boxes_col", boxes_col, DEFAULT_SIZE );
+        shader.setUniformArray( "boxes_size", boxes_size, DEFAULT_SIZE );
+        shader.setUniformArray( "planes_norm", planes_norm, PLANES_SIZE );
+        shader.setUniformArray( "planes_col", planes_col, PLANES_SIZE );
+        shader.setUniformArray( "cones_down_point", cones_down_point, DEFAULT_SIZE );
+        shader.setUniformArray( "cones_up_point", cones_up_point, DEFAULT_SIZE );
+        shader.setUniformArray( "cones_col", cones_col, DEFAULT_SIZE );
         shader.setUniform( "ulight_pos", ulight_pos );
 
         if ( switcher == true ) {
