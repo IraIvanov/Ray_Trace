@@ -30,6 +30,10 @@ uniform vec4 cones_up_point[DEFAULT_SIZE];
 uniform vec4 cones_down_point[DEFAULT_SIZE];
 uniform vec4 cones_col[DEFAULT_SIZE];
 
+uniform vec4 cyl_up_point[DEFAULT_SIZE];
+uniform vec3 cyl_down_point[DEFAULT_SIZE];
+uniform vec4 cyl_col[DEFAULT_SIZE];
+
 const float MAX_DIST = 99999.0; 
 const float eps = 0.0001;
 
@@ -133,8 +137,7 @@ float plaIntersect( in vec3 ro, in vec3 rd, in vec4 p ) {
 
 // cone defined by extremes pa and pb, and radious ra and rb
 //Only one square root and one division is emplyed in the worst case. dot2(v) is dot(v,v)
-vec4 coneIntersect( in vec3  ro, in vec3  rd, in vec3  pa, in vec3  pb, in float ra, in float rb )
-{
+vec4 coneIntersect( in vec3  ro, in vec3  rd, in vec3  pa, in vec3  pb, in float ra, in float rb ) {
     vec3  ba = pb - pa;
     vec3  oa = ro - pa;
     vec3  ob = ro - pb;
@@ -263,8 +266,7 @@ float diskIntersect( in vec3 ro, in vec3 rd, vec3 c, vec3 n, float r ) {
     return (dot(q,q)<r*r) ? t : -1.0;
 }
 
-vec4 cylIntersect( in vec3 ro, in vec3 rd, in vec3 a, in vec3 b, float ra )
-{
+vec4 cylIntersect( in vec3 ro, in vec3 rd, in vec3 a, in vec3 b, float ra ) {
     vec3  ba = b  - a;
     vec3  oc = ro - a;
     float baba = dot(ba,ba);
@@ -366,8 +368,32 @@ vec4 CastRay( inout vec3 ro, inout vec3 rd, vec3 light_pos ) {
         if ( (temp_inter.x > 0.0) && (temp_inter.x < inter.x) ) {
 
             inter = temp_inter;
-            n = normalize( coneIntersect( ro, rd, pa, pb, ra, rb).yzw);
+            n = coneIntersect( ro, rd, pa, pb, ra, rb).yzw;
             col = cones_col[i];
+
+        }
+
+    }
+
+    vec3 a = vec3( 0.0 );
+    vec3 b = vec3( 0.0 );
+    float r = 0.0;
+
+    for ( int i = 0; i < DEFAULT_SIZE; i++ ) {
+
+        if ( cyl_up_point[i].w < eps ) continue;
+
+        a = cyl_up_point[i].xyz;
+        b = cyl_down_point[i];
+        r = cyl_up_point[i].w;
+
+        temp_inter = vec2( cylIntersect( ro, rd, a, b, r) );
+
+        if ( (temp_inter.x > 0.0) && (temp_inter.x < inter.x) ) {
+
+            inter = temp_inter;
+            n = normalize( cylIntersect( ro, rd, a, b, r ).yzw );
+            col = cyl_col[i];
 
         }
 

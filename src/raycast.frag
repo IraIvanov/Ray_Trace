@@ -30,6 +30,10 @@ uniform vec4 cones_up_point[DEFAULT_SIZE];
 uniform vec4 cones_down_point[DEFAULT_SIZE];
 uniform vec4 cones_col[DEFAULT_SIZE];
 
+uniform vec4 cyl_up_point[DEFAULT_SIZE];
+uniform vec3 cyl_down_point[DEFAULT_SIZE];
+uniform vec4 cyl_col[DEFAULT_SIZE];
+
 const float MAX_DIST = 99999.0;
 const float eps = 0.0001; 
 
@@ -122,6 +126,30 @@ vec4 coneIntersect( in vec3  ro, in vec3  rd, in vec3  pa, in vec3  pb, in float
     return vec4(t, normalize(m0*(m0*(oa+t*rd)+rr*ba*ra)-ba*hy*y));
 }
 
+vec4 cylIntersect( in vec3 ro, in vec3 rd, in vec3 a, in vec3 b, float ra ) {
+    vec3  ba = b  - a;
+    vec3  oc = ro - a;
+    float baba = dot(ba,ba);
+    float bard = dot(ba,rd);
+    float baoc = dot(ba,oc);
+    float k2 = baba            - bard*bard;
+    float k1 = baba*dot(oc,rd) - baoc*bard;
+    float k0 = baba*dot(oc,oc) - baoc*baoc - ra*ra*baba;
+    float h = k1*k1 - k2*k0;
+    if( h<0.0 ) return vec4(-1.0);//no intersection
+    h = sqrt(h);
+    float t = (-k1-h)/k2;
+    // body
+    float y = baoc + t*bard;
+    if( y>0.0 && y<baba ) return vec4( t, (oc+t*rd - ba*y/baba)/ra );
+    // caps
+    t = ( ((y<0.0) ? 0.0 : baba) - baoc)/bard;
+    if( abs(k1+k2*t)<h )
+    {
+        return vec4( t, ba*sign(y)/sqrt(baba) );
+    }
+    return vec4(-1.0);//no intersection
+}
 
 vec3 CastRay( inout vec3 ro, inout vec3 rd, vec3 light_pos ) {
 
@@ -200,6 +228,30 @@ vec3 CastRay( inout vec3 ro, inout vec3 rd, vec3 light_pos ) {
             inter = temp_inter;
             n = normalize( coneIntersect( ro, rd, pa, pb, ra, rb).yzw);
             col = cones_col[i];
+
+        }
+
+    }
+
+    vec3 a = vec3( 0.0 );
+    vec3 b = vec3( 0.0 );
+    float r = 0.0;
+
+    for ( int i = 0; i < DEFAULT_SIZE; i++ ) {
+
+        if ( cyl_up_point[i].w < eps ) continue;
+
+        a = cyl_up_point[i].xyz;
+        b = cyl_down_point[i];
+        r = cyl_up_point[i].w;
+
+        temp_inter = vec2( cylIntersect( ro, rd, a, b, r) );
+
+        if ( (temp_inter.x > 0.0) && (temp_inter.x < inter.x) ) {
+
+            inter = temp_inter;
+            n = normalize( cylIntersect( ro, rd, a, b, r ).yzw );
+            col = cyl_col[i];
 
         }
 
