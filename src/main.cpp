@@ -1,12 +1,74 @@
 #include <SFML/Graphics.hpp>
+#include <SFML/System/Clock.hpp>
+#include <SFML/Window/Event.hpp>
 #include <SFML/OpenGL.hpp>
+
+#include "../include/ImGui/imgui.h"
+#include "../include/ImGui/imgui-SFML.h"
+
 #include <iostream>
 #include "../include/config.hpp"
 #include <cmath>
 #include <random>
 
 int main() {
-    
+
+ //--------------------WINDOW IMGUI EXAMPLE START ------------------------//
+    sf::RenderWindow window1(sf::VideoMode(640, 480), "");
+    window1.setVerticalSyncEnabled(true);
+    ImGui::SFML::Init(window1);
+
+    sf::Color bgColor;
+    float color[3] = { 0.f, 0.f, 0.f };
+
+    // здесь мы будем использовать массив char. Чтобы использовать
+    // std::string нужно сделать действия, описанные во второй части
+    char windowTitle[255] = "ImGui + SFML = <3";
+    window1.setTitle(windowTitle);
+
+    sf::Clock deltaClock;
+    while (window1.isOpen()) {
+        sf::Event event;
+        while (window1.pollEvent(event)) {
+            ImGui::SFML::ProcessEvent(event);
+
+            if (event.type == sf::Event::Closed) {
+                window1.close();
+            }
+        }
+
+        ImGui::SFML::Update(window1, deltaClock.restart());
+
+        ImGui::Begin("Sample window"); // создаём окно
+
+        // Инструмент выбора цвета
+        if (ImGui::ColorEdit3("Background color", color)) {
+            // код вызывается при изменении значения, поэтому всё
+            // обновляется автоматически
+            bgColor.r = static_cast<sf::Uint8>(color[0] * 255.f);
+            bgColor.g = static_cast<sf::Uint8>(color[1] * 255.f);
+            bgColor.b = static_cast<sf::Uint8>(color[2] * 255.f);
+        }
+
+        ImGui::InputText("Window title", windowTitle, 255);
+
+        if (ImGui::Button("Update window title")) {
+            // этот код выполняется, когда юзер жмёт на кнопку
+            // здесь можно было бы написать 
+            // if(ImGui::InputText(...))
+            window1.setTitle(windowTitle);
+        }
+        ImGui::End(); // end window
+
+        window1.clear(bgColor); // заполняем окно заданным цветом
+        ImGui::SFML::Render(window1);
+        window1.display();
+    }
+
+    ImGui::SFML::Shutdown();
+
+ //--------------------WINDOW IMGUI EXAMPLE END------------------------//
+
     sf::RenderWindow window ( sf::VideoMode( WIDTH, HIGHT ), "test window");
     window.setFramerateLimit(MAX_FPS);
     window.setVerticalSyncEnabled( false ); // Vsync Disabled

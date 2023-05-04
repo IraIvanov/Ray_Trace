@@ -1,0 +1,2 @@
+/usr/bin/ar qc libIMGUILIB.a  
+/usr/bin/ranlib libIMGUILIB.a
