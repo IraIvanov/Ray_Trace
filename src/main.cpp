@@ -12,64 +12,8 @@
 #include <random>
 
 int main() {
-
- //--------------------WINDOW IMGUI EXAMPLE START ------------------------//
-    sf::RenderWindow window1(sf::VideoMode(640, 480), "");
-    window1.setVerticalSyncEnabled(true);
-    ImGui::SFML::Init(window1);
-
-    sf::Color bgColor;
-    float color[3] = { 0.f, 0.f, 0.f };
-
-    // здесь мы будем использовать массив char. Чтобы использовать
-    // std::string нужно сделать действия, описанные во второй части
-    char windowTitle[255] = "ImGui + SFML = <3";
-    window1.setTitle(windowTitle);
-
-    sf::Clock deltaClock;
-    while (window1.isOpen()) {
-        sf::Event event;
-        while (window1.pollEvent(event)) {
-            ImGui::SFML::ProcessEvent(event);
-
-            if (event.type == sf::Event::Closed) {
-                window1.close();
-            }
-        }
-
-        ImGui::SFML::Update(window1, deltaClock.restart());
-
-        ImGui::Begin("Sample window"); // создаём окно
-
-        // Инструмент выбора цвета
-        if (ImGui::ColorEdit3("Background color", color)) {
-            // код вызывается при изменении значения, поэтому всё
-            // обновляется автоматически
-            bgColor.r = static_cast<sf::Uint8>(color[0] * 255.f);
-            bgColor.g = static_cast<sf::Uint8>(color[1] * 255.f);
-            bgColor.b = static_cast<sf::Uint8>(color[2] * 255.f);
-        }
-
-        ImGui::InputText("Window title", windowTitle, 255);
-
-        if (ImGui::Button("Update window title")) {
-            // этот код выполняется, когда юзер жмёт на кнопку
-            // здесь можно было бы написать 
-            // if(ImGui::InputText(...))
-            window1.setTitle(windowTitle);
-        }
-        ImGui::End(); // end window
-
-        window1.clear(bgColor); // заполняем окно заданным цветом
-        ImGui::SFML::Render(window1);
-        window1.display();
-    }
-
-    ImGui::SFML::Shutdown();
-
- //--------------------WINDOW IMGUI EXAMPLE END------------------------//
-
-    sf::RenderWindow window ( sf::VideoMode( WIDTH, HIGHT ), "test window");
+    sf::RenderWindow window ( sf::VideoMode( WIDTH, HIGHT ), "RayTrace window");
+    ImGui::SFML::Init(window);
     window.setFramerateLimit(MAX_FPS);
     window.setVerticalSyncEnabled( false ); // Vsync Disabled
 
@@ -233,11 +177,23 @@ int main() {
 
     sf::Mouse::setPosition( sf::Vector2i( WIDTH/2, HIGHT/2 ), window );
     window.setActive(true);
+
+
+    bool SpheresExist = true;
+    bool BoxesExist = true;
+    bool PlanesExist = true;
+    bool ConesExist = true;
+    bool CylExist = true;
+    sf::Color bgColor;
+    float color[3] = { 0.f, 0.f, 0.f };
+
     while( window.isOpen() ) { // main loop
 
         sf::Event event;
 
         while ( window.pollEvent(event) ) {   // event loop
+
+            ImGui::SFML::ProcessEvent(window, event);
 
             switch ( event.type ) {
 
@@ -345,6 +301,8 @@ int main() {
 
                             break;
 
+                            
+
                         default:
                             break;
                     }
@@ -355,7 +313,10 @@ int main() {
                     break;
             }
  
-        } 
+        }
+
+        ImGui::SFML::Update(window, clock.restart()); 
+
 
         float res_mouse_x =  float(mouse_x) / WIDTH - 0.5f; 
         float res_mouse_y =  float(mouse_y) / HIGHT - 0.5f;
@@ -364,6 +325,20 @@ int main() {
 
         time = clock.getElapsedTime();
         float u_time = time.asSeconds();
+        
+//--------------IMGUI SETTINGS WINDOW START ---------------------
+        ImGui::Begin("Settings Window");
+        if (ImGui::ColorEdit3("SMTH Color", color)) 
+        {
+            //add color settings for figures
+        }
+        ImGui::Checkbox("Spheres", &SpheresExist);
+        ImGui::Checkbox("Boxes", &BoxesExist);
+        ImGui::Checkbox("Cones", &ConesExist);
+        ImGui::Checkbox("Cyl", &CylExist);
+        ImGui::End();
+//-----------------IMGUI SETTINGS WINDOW END -----------------
+
         shader.setUniform("u_time",  u_time);                 
         shader.setUniform("u_camera_pos", camera_positoin );
         shader.setUniform("u_sample_part", 1.0f / FrameStill) ;
@@ -408,10 +383,12 @@ int main() {
 
         }
 
+        ImGui::SFML::Render(window);
+        
         window.display();
         FrameStill++;
-
     }
 
+    ImGui::SFML::Shutdown(window);
     return 0;
 }

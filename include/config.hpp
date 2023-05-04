@@ -1,9 +1,9 @@
 #ifndef CONFIG_H_INCLUDED
 #define CONFIG_H_INCLUDED
 
-#define HIGHT 360
-#define WIDTH 360
-#define MAX_FPS 120
+#define HIGHT 720
+#define WIDTH 720
+#define MAX_FPS 60
 #define MOUSE_SENSITIVITY 3.f
 #define CONTROL_KEYS_NUM 6
 #define MOVING_KEYS 6
