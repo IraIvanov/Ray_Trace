@@ -43,10 +43,10 @@ RM = /usr/bin/cmake -E remove -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/fatalick/Projects/Efanov_4sem/Ray_Trace
+CMAKE_SOURCE_DIR = /home/shorteststraw/study/Ray_Trace
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/fatalick/Projects/Efanov_4sem/Ray_Trace
+CMAKE_BINARY_DIR = /home/shorteststraw/study/Ray_Trace
 
 # Include any dependencies generated for this target.
 include CMakeFiles/Ray_Trace.dir/depend.make
@@ -59,81 +59,81 @@ include CMakeFiles/Ray_Trace.dir/flags.make
 
 CMakeFiles/Ray_Trace.dir/src/main.cpp.o: CMakeFiles/Ray_Trace.dir/flags.make
 CMakeFiles/Ray_Trace.dir/src/main.cpp.o: src/main.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/fatalick/Projects/Efanov_4sem/Ray_Trace/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/Ray_Trace.dir/src/main.cpp.o"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/Ray_Trace.dir/src/main.cpp.o -c /home/fatalick/Projects/Efanov_4sem/Ray_Trace/src/main.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/shorteststraw/study/Ray_Trace/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/Ray_Trace.dir/src/main.cpp.o"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/Ray_Trace.dir/src/main.cpp.o -c /home/shorteststraw/study/Ray_Trace/src/main.cpp
 
 CMakeFiles/Ray_Trace.dir/src/main.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/Ray_Trace.dir/src/main.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/fatalick/Projects/Efanov_4sem/Ray_Trace/src/main.cpp > CMakeFiles/Ray_Trace.dir/src/main.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/shorteststraw/study/Ray_Trace/src/main.cpp > CMakeFiles/Ray_Trace.dir/src/main.cpp.i
 
 CMakeFiles/Ray_Trace.dir/src/main.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/Ray_Trace.dir/src/main.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/fatalick/Projects/Efanov_4sem/Ray_Trace/src/main.cpp -o CMakeFiles/Ray_Trace.dir/src/main.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/shorteststraw/study/Ray_Trace/src/main.cpp -o CMakeFiles/Ray_Trace.dir/src/main.cpp.s
 
 CMakeFiles/Ray_Trace.dir/include/ImGui/imgui.cpp.o: CMakeFiles/Ray_Trace.dir/flags.make
 CMakeFiles/Ray_Trace.dir/include/ImGui/imgui.cpp.o: include/ImGui/imgui.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/fatalick/Projects/Efanov_4sem/Ray_Trace/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/Ray_Trace.dir/include/ImGui/imgui.cpp.o"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/Ray_Trace.dir/include/ImGui/imgui.cpp.o -c /home/fatalick/Projects/Efanov_4sem/Ray_Trace/include/ImGui/imgui.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/shorteststraw/study/Ray_Trace/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/Ray_Trace.dir/include/ImGui/imgui.cpp.o"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/Ray_Trace.dir/include/ImGui/imgui.cpp.o -c /home/shorteststraw/study/Ray_Trace/include/ImGui/imgui.cpp
 
 CMakeFiles/Ray_Trace.dir/include/ImGui/imgui.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/Ray_Trace.dir/include/ImGui/imgui.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/fatalick/Projects/Efanov_4sem/Ray_Trace/include/ImGui/imgui.cpp > CMakeFiles/Ray_Trace.dir/include/ImGui/imgui.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/shorteststraw/study/Ray_Trace/include/ImGui/imgui.cpp > CMakeFiles/Ray_Trace.dir/include/ImGui/imgui.cpp.i
 
 CMakeFiles/Ray_Trace.dir/include/ImGui/imgui.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/Ray_Trace.dir/include/ImGui/imgui.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/fatalick/Projects/Efanov_4sem/Ray_Trace/include/ImGui/imgui.cpp -o CMakeFiles/Ray_Trace.dir/include/ImGui/imgui.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/shorteststraw/study/Ray_Trace/include/ImGui/imgui.cpp -o CMakeFiles/Ray_Trace.dir/include/ImGui/imgui.cpp.s
 
 CMakeFiles/Ray_Trace.dir/include/ImGui/imgui_draw.cpp.o: CMakeFiles/Ray_Trace.dir/flags.make
 CMakeFiles/Ray_Trace.dir/include/ImGui/imgui_draw.cpp.o: include/ImGui/imgui_draw.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/fatalick/Projects/Efanov_4sem/Ray_Trace/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/Ray_Trace.dir/include/ImGui/imgui_draw.cpp.o"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/Ray_Trace.dir/include/ImGui/imgui_draw.cpp.o -c /home/fatalick/Projects/Efanov_4sem/Ray_Trace/include/ImGui/imgui_draw.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/shorteststraw/study/Ray_Trace/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/Ray_Trace.dir/include/ImGui/imgui_draw.cpp.o"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/Ray_Trace.dir/include/ImGui/imgui_draw.cpp.o -c /home/shorteststraw/study/Ray_Trace/include/ImGui/imgui_draw.cpp
 
 CMakeFiles/Ray_Trace.dir/include/ImGui/imgui_draw.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/Ray_Trace.dir/include/ImGui/imgui_draw.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/fatalick/Projects/Efanov_4sem/Ray_Trace/include/ImGui/imgui_draw.cpp > CMakeFiles/Ray_Trace.dir/include/ImGui/imgui_draw.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/shorteststraw/study/Ray_Trace/include/ImGui/imgui_draw.cpp > CMakeFiles/Ray_Trace.dir/include/ImGui/imgui_draw.cpp.i
 
 CMakeFiles/Ray_Trace.dir/include/ImGui/imgui_draw.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/Ray_Trace.dir/include/ImGui/imgui_draw.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/fatalick/Projects/Efanov_4sem/Ray_Trace/include/ImGui/imgui_draw.cpp -o CMakeFiles/Ray_Trace.dir/include/ImGui/imgui_draw.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/shorteststraw/study/Ray_Trace/include/ImGui/imgui_draw.cpp -o CMakeFiles/Ray_Trace.dir/include/ImGui/imgui_draw.cpp.s
 
 CMakeFiles/Ray_Trace.dir/include/ImGui/imgui_tables.cpp.o: CMakeFiles/Ray_Trace.dir/flags.make
 CMakeFiles/Ray_Trace.dir/include/ImGui/imgui_tables.cpp.o: include/ImGui/imgui_tables.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/fatalick/Projects/Efanov_4sem/Ray_Trace/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/Ray_Trace.dir/include/ImGui/imgui_tables.cpp.o"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/Ray_Trace.dir/include/ImGui/imgui_tables.cpp.o -c /home/fatalick/Projects/Efanov_4sem/Ray_Trace/include/ImGui/imgui_tables.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/shorteststraw/study/Ray_Trace/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/Ray_Trace.dir/include/ImGui/imgui_tables.cpp.o"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/Ray_Trace.dir/include/ImGui/imgui_tables.cpp.o -c /home/shorteststraw/study/Ray_Trace/include/ImGui/imgui_tables.cpp
 
 CMakeFiles/Ray_Trace.dir/include/ImGui/imgui_tables.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/Ray_Trace.dir/include/ImGui/imgui_tables.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/fatalick/Projects/Efanov_4sem/Ray_Trace/include/ImGui/imgui_tables.cpp > CMakeFiles/Ray_Trace.dir/include/ImGui/imgui_tables.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/shorteststraw/study/Ray_Trace/include/ImGui/imgui_tables.cpp > CMakeFiles/Ray_Trace.dir/include/ImGui/imgui_tables.cpp.i
 
 CMakeFiles/Ray_Trace.dir/include/ImGui/imgui_tables.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/Ray_Trace.dir/include/ImGui/imgui_tables.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/fatalick/Projects/Efanov_4sem/Ray_Trace/include/ImGui/imgui_tables.cpp -o CMakeFiles/Ray_Trace.dir/include/ImGui/imgui_tables.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/shorteststraw/study/Ray_Trace/include/ImGui/imgui_tables.cpp -o CMakeFiles/Ray_Trace.dir/include/ImGui/imgui_tables.cpp.s
 
 CMakeFiles/Ray_Trace.dir/include/ImGui/imgui_widgets.cpp.o: CMakeFiles/Ray_Trace.dir/flags.make
 CMakeFiles/Ray_Trace.dir/include/ImGui/imgui_widgets.cpp.o: include/ImGui/imgui_widgets.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/fatalick/Projects/Efanov_4sem/Ray_Trace/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/Ray_Trace.dir/include/ImGui/imgui_widgets.cpp.o"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/Ray_Trace.dir/include/ImGui/imgui_widgets.cpp.o -c /home/fatalick/Projects/Efanov_4sem/Ray_Trace/include/ImGui/imgui_widgets.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/shorteststraw/study/Ray_Trace/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/Ray_Trace.dir/include/ImGui/imgui_widgets.cpp.o"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/Ray_Trace.dir/include/ImGui/imgui_widgets.cpp.o -c /home/shorteststraw/study/Ray_Trace/include/ImGui/imgui_widgets.cpp
 
 CMakeFiles/Ray_Trace.dir/include/ImGui/imgui_widgets.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/Ray_Trace.dir/include/ImGui/imgui_widgets.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/fatalick/Projects/Efanov_4sem/Ray_Trace/include/ImGui/imgui_widgets.cpp > CMakeFiles/Ray_Trace.dir/include/ImGui/imgui_widgets.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/shorteststraw/study/Ray_Trace/include/ImGui/imgui_widgets.cpp > CMakeFiles/Ray_Trace.dir/include/ImGui/imgui_widgets.cpp.i
 
 CMakeFiles/Ray_Trace.dir/include/ImGui/imgui_widgets.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/Ray_Trace.dir/include/ImGui/imgui_widgets.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/fatalick/Projects/Efanov_4sem/Ray_Trace/include/ImGui/imgui_widgets.cpp -o CMakeFiles/Ray_Trace.dir/include/ImGui/imgui_widgets.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/shorteststraw/study/Ray_Trace/include/ImGui/imgui_widgets.cpp -o CMakeFiles/Ray_Trace.dir/include/ImGui/imgui_widgets.cpp.s
 
 CMakeFiles/Ray_Trace.dir/include/ImGui/imgui-SFML.cpp.o: CMakeFiles/Ray_Trace.dir/flags.make
 CMakeFiles/Ray_Trace.dir/include/ImGui/imgui-SFML.cpp.o: include/ImGui/imgui-SFML.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/fatalick/Projects/Efanov_4sem/Ray_Trace/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object CMakeFiles/Ray_Trace.dir/include/ImGui/imgui-SFML.cpp.o"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/Ray_Trace.dir/include/ImGui/imgui-SFML.cpp.o -c /home/fatalick/Projects/Efanov_4sem/Ray_Trace/include/ImGui/imgui-SFML.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/shorteststraw/study/Ray_Trace/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object CMakeFiles/Ray_Trace.dir/include/ImGui/imgui-SFML.cpp.o"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/Ray_Trace.dir/include/ImGui/imgui-SFML.cpp.o -c /home/shorteststraw/study/Ray_Trace/include/ImGui/imgui-SFML.cpp
 
 CMakeFiles/Ray_Trace.dir/include/ImGui/imgui-SFML.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/Ray_Trace.dir/include/ImGui/imgui-SFML.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/fatalick/Projects/Efanov_4sem/Ray_Trace/include/ImGui/imgui-SFML.cpp > CMakeFiles/Ray_Trace.dir/include/ImGui/imgui-SFML.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/shorteststraw/study/Ray_Trace/include/ImGui/imgui-SFML.cpp > CMakeFiles/Ray_Trace.dir/include/ImGui/imgui-SFML.cpp.i
 
 CMakeFiles/Ray_Trace.dir/include/ImGui/imgui-SFML.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/Ray_Trace.dir/include/ImGui/imgui-SFML.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/fatalick/Projects/Efanov_4sem/Ray_Trace/include/ImGui/imgui-SFML.cpp -o CMakeFiles/Ray_Trace.dir/include/ImGui/imgui-SFML.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/shorteststraw/study/Ray_Trace/include/ImGui/imgui-SFML.cpp -o CMakeFiles/Ray_Trace.dir/include/ImGui/imgui-SFML.cpp.s
 
 # Object files for target Ray_Trace
 Ray_Trace_OBJECTS = \
@@ -160,10 +160,9 @@ Ray_Trace: /usr/lib/x86_64-linux-gnu/libsfml-network.so.2.5.1
 Ray_Trace: /usr/lib/x86_64-linux-gnu/libsfml-audio.so.2.5.1
 Ray_Trace: /usr/lib/x86_64-linux-gnu/libOpenGL.so
 Ray_Trace: /usr/lib/x86_64-linux-gnu/libGLX.so
-Ray_Trace: /usr/lib/x86_64-linux-gnu/libGLU.so
 Ray_Trace: /usr/lib/x86_64-linux-gnu/libsfml-system.so.2.5.1
 Ray_Trace: CMakeFiles/Ray_Trace.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/fatalick/Projects/Efanov_4sem/Ray_Trace/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Linking CXX executable Ray_Trace"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/shorteststraw/study/Ray_Trace/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Linking CXX executable Ray_Trace"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/Ray_Trace.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
@@ -176,6 +175,6 @@ CMakeFiles/Ray_Trace.dir/clean:
 .PHONY : CMakeFiles/Ray_Trace.dir/clean
 
 CMakeFiles/Ray_Trace.dir/depend:
-	cd /home/fatalick/Projects/Efanov_4sem/Ray_Trace && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/fatalick/Projects/Efanov_4sem/Ray_Trace /home/fatalick/Projects/Efanov_4sem/Ray_Trace /home/fatalick/Projects/Efanov_4sem/Ray_Trace /home/fatalick/Projects/Efanov_4sem/Ray_Trace /home/fatalick/Projects/Efanov_4sem/Ray_Trace/CMakeFiles/Ray_Trace.dir/DependInfo.cmake --color=$(COLOR)
+	cd /home/shorteststraw/study/Ray_Trace && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/shorteststraw/study/Ray_Trace /home/shorteststraw/study/Ray_Trace /home/shorteststraw/study/Ray_Trace /home/shorteststraw/study/Ray_Trace /home/shorteststraw/study/Ray_Trace/CMakeFiles/Ray_Trace.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : CMakeFiles/Ray_Trace.dir/depend
 

@@ -229,7 +229,8 @@ int main() {
 
 
 
-    sf::Vector3f camera_positoin( 0.f, 0.f, 0.f );
+    sf::Vector3f camera_position( 0.f, 0.f, 0.f );
+    sf::Vector3f camera_movement( 0.f, 0.f, 0.f );
 
     sf::Mouse::setPosition( sf::Vector2i( WIDTH/2, HIGHT/2 ), window );
     window.setActive(true);
@@ -272,42 +273,42 @@ int main() {
                         
                         case( sf::Keyboard::W ): 
 
-                            camera_positoin.x += WALKING_PACE;
+                            camera_movement.x = WALKING_PACE;
                             FrameStill = 1;
 
                             break;
 
                         case( sf::Keyboard::A ): 
 
-                            camera_positoin.y -= WALKING_PACE;
+                            camera_movement.y = -WALKING_PACE;
                             FrameStill = 1;
 
                             break;
                         
                         case( sf::Keyboard::S ): 
 
-                            camera_positoin.x -= WALKING_PACE;
+                            camera_movement.x = -WALKING_PACE;
                             FrameStill = 1;
 
                             break;
 
                         case( sf::Keyboard::D ): 
 
-                            camera_positoin.y += WALKING_PACE;
+                            camera_movement.y = WALKING_PACE;
                             FrameStill = 1;
 
                             break;
 
                         case( sf::Keyboard::Up ): 
 
-                            camera_positoin.z -= WALKING_PACE;
+                            camera_movement.z = -WALKING_PACE;
                             FrameStill = 1;
 
                             break;
 
                         case( sf::Keyboard::Down ): 
 
-                            camera_positoin.z +=WALKING_PACE;
+                            camera_movement.z = WALKING_PACE;
                             FrameStill = 1;
 
                             break;
@@ -357,15 +358,23 @@ int main() {
  
         } 
 
-        float res_mouse_x =  float(mouse_x) / WIDTH - 0.5f; 
-        float res_mouse_y =  float(mouse_y) / HIGHT - 0.5f;
+        float res_mouse_x =  (float(mouse_x) / WIDTH - 0.5f) * MOUSE_SENSITIVITY; 
+        float res_mouse_y =  (float(mouse_y) / HIGHT - 0.5f) * MOUSE_SENSITIVITY;
         window.setActive();
-        shader.setUniform("u_mouse",  sf::Vector2f(res_mouse_x * MOUSE_SENSITIVITY, res_mouse_y * MOUSE_SENSITIVITY ) );
+        shader.setUniform("u_mouse",  sf::Vector2f(res_mouse_x , res_mouse_y ) );
+
+        camera_position.x += cos( res_mouse_x ) * camera_movement.x - camera_movement.y * sin ( res_mouse_x );
+        camera_position.y += sin( res_mouse_x ) * camera_movement.x + camera_movement.y * cos ( res_mouse_x );
+        camera_position.z += camera_movement.z;
+
+        camera_movement.x = 0.f;
+        camera_movement.y = 0.f;
+        camera_movement.z = 0.f;
 
         time = clock.getElapsedTime();
         float u_time = time.asSeconds();
         shader.setUniform("u_time",  u_time);                 
-        shader.setUniform("u_camera_pos", camera_positoin );
+        shader.setUniform("u_camera_pos", camera_position );
         shader.setUniform("u_sample_part", 1.0f / FrameStill) ;
         shader.setUniform("u_seed1", sf::Vector2f((float)dist(e2), (float)dist(e2)) * 999.0f);
 		shader.setUniform("u_seed2", sf::Vector2f((float)dist(e2), (float)dist(e2)) * 999.0f);

@@ -7,7 +7,7 @@
 #define MOUSE_SENSITIVITY 3.f
 #define CONTROL_KEYS_NUM 6
 #define MOVING_KEYS 6
-#define WALKING_PACE 0.1f
+#define WALKING_PACE 0.3f
 
 #define DEFAULT_SIZE 15
 #define PLANES_SIZE 5
