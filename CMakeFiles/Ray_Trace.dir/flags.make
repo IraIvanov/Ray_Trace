@@ -6,5 +6,5 @@ CXX_FLAGS =
 
 CXX_DEFINES = 
 
-CXX_INCLUDES = -I/home/fatalick/Projects/Efanov_4sem/Ray_Trace/include 
+CXX_INCLUDES = -I/home/oleg/Загрузки/Ray_Trace/include 
 

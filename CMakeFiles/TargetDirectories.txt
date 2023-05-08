@@ -1,3 +1,3 @@
-/home/fatalick/Projects/Efanov_4sem/Ray_Trace/CMakeFiles/rebuild_cache.dir
-/home/fatalick/Projects/Efanov_4sem/Ray_Trace/CMakeFiles/edit_cache.dir
-/home/fatalick/Projects/Efanov_4sem/Ray_Trace/CMakeFiles/Ray_Trace.dir
+/home/oleg/Загрузки/Ray_Trace/CMakeFiles/rebuild_cache.dir
+/home/oleg/Загрузки/Ray_Trace/CMakeFiles/edit_cache.dir
+/home/oleg/Загрузки/Ray_Trace/CMakeFiles/Ray_Trace.dir

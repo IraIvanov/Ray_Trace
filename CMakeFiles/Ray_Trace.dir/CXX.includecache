@@ -6,7 +6,7 @@
 
 #IncludeRegexTransform: 
 
-/home/fatalick/Projects/Efanov_4sem/Ray_Trace/include/ImGui/imconfig.h
+/home/oleg/Загрузки/Ray_Trace/include/ImGui/imconfig.h
 SFML/Graphics/Color.hpp
 -
 SFML/System/Vector2.hpp
@@ -14,9 +14,9 @@ SFML/System/Vector2.hpp
 cstdint
 -
 imgui-SFML_export.h
-/home/fatalick/Projects/Efanov_4sem/Ray_Trace/include/ImGui/imgui-SFML_export.h
+/home/oleg/Загрузки/Ray_Trace/include/ImGui/imgui-SFML_export.h
 
-/home/fatalick/Projects/Efanov_4sem/Ray_Trace/include/ImGui/imgui-SFML.h
+/home/oleg/Загрузки/Ray_Trace/include/ImGui/imgui-SFML.h
 SFML/Graphics/Color.hpp
 -
 SFML/Graphics/Rect.hpp
@@ -28,13 +28,13 @@ SFML/System/Vector2.hpp
 SFML/Window/Joystick.hpp
 -
 imgui-SFML_export.h
-/home/fatalick/Projects/Efanov_4sem/Ray_Trace/include/ImGui/imgui-SFML_export.h
+/home/oleg/Загрузки/Ray_Trace/include/ImGui/imgui-SFML_export.h
 
-/home/fatalick/Projects/Efanov_4sem/Ray_Trace/include/ImGui/imgui-SFML_export.h
+/home/oleg/Загрузки/Ray_Trace/include/ImGui/imgui-SFML_export.h
 
-/home/fatalick/Projects/Efanov_4sem/Ray_Trace/include/ImGui/imgui.h
+/home/oleg/Загрузки/Ray_Trace/include/ImGui/imgui.h
 imconfig.h
-/home/fatalick/Projects/Efanov_4sem/Ray_Trace/include/ImGui/imconfig.h
+/home/oleg/Загрузки/Ray_Trace/include/ImGui/imconfig.h
 float.h
 -
 stdarg.h
@@ -46,29 +46,29 @@ string.h
 assert.h
 -
 imgui_user.h
-/home/fatalick/Projects/Efanov_4sem/Ray_Trace/include/ImGui/imgui_user.h
+/home/oleg/Загрузки/Ray_Trace/include/ImGui/imgui_user.h
 
-/home/fatalick/Projects/Efanov_4sem/Ray_Trace/include/config.hpp
+/home/oleg/Загрузки/Ray_Trace/include/config.hpp
 
-/home/fatalick/Projects/Efanov_4sem/Ray_Trace/src/main.cpp
+/home/oleg/Загрузки/Ray_Trace/src/main.cpp
 SFML/Graphics.hpp
+-
+SFML/OpenGL.hpp
 -
 SFML/System/Clock.hpp
 -
 SFML/Window/Event.hpp
 -
-SFML/OpenGL.hpp
--
-../include/ImGui/imgui.h
-/home/fatalick/Projects/Efanov_4sem/Ray_Trace/include/ImGui/imgui.h
-../include/ImGui/imgui-SFML.h
-/home/fatalick/Projects/Efanov_4sem/Ray_Trace/include/ImGui/imgui-SFML.h
-iostream
--
-../include/config.hpp
-/home/fatalick/Projects/Efanov_4sem/Ray_Trace/include/config.hpp
 cmath
+-
+iostream
 -
 random
 -
+../include/ImGui/imgui-SFML.h
+/home/oleg/Загрузки/Ray_Trace/include/ImGui/imgui-SFML.h
+../include/ImGui/imgui.h
+/home/oleg/Загрузки/Ray_Trace/include/ImGui/imgui.h
+../include/config.hpp
+/home/oleg/Загрузки/Ray_Trace/include/config.hpp
 
