@@ -15,10 +15,12 @@
 
 int main() {
   sf::RenderWindow window(sf::VideoMode(WIDTH, HIGHT), "RayTrace window",
-                          sf::Style::Fullscreen);
+                          sf::Style::Fullscreen, sf::ContextSettings(0, 0, 16));
   ImGui::SFML::Init(window);
   window.setFramerateLimit(MAX_FPS);
-  window.setVerticalSyncEnabled(true);  // Vsync Disabled
+  window.setVerticalSyncEnabled(true);
+
+  glEnable(GL_MULTISAMPLE_ARB);  // Antialiasing on
 
   sf::Shader shader;
 
