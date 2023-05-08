@@ -4,7 +4,8 @@
 #include <SFML/OpenGL.hpp>
 
 #include "../include/ImGui/imgui.h"
-#include "../include/ImGui/imgui-SFML.h"
+#include "../include/ImGui/imgui-SFML.h" 
+
 
 #include <iostream>
 #include "../include/config.hpp"
@@ -184,9 +185,10 @@ int main() {
     int SphereX = 0;
     int SphereY = 0;
     int SphereZ = 0;
-    float SphereHaze = 0;
-    float SphereRefraction = 0;
     float SphereParam = 1;
+    float antiSphereParam = -1;
+    int SphereStatus = 2;
+    float SphereIntention = 50;
     float SphereColor[3] = {(float)204/ 255, (float)77/ 255, (float)5/ 255 };
 
     const char* status[] = {"Haze", "Light", "Usual"};
@@ -356,38 +358,54 @@ int main() {
 
 
         ImGui::Begin("Settings Window");
-        ImGui::InputInt("Spheres Number", &spheres_num, 0, DEFAULT_SIZE);
-        ImGui::InputInt("Boxes Number", &boxes_num, 0, DEFAULT_SIZE);
-        ImGui::InputInt("Cyl Number", &cyl_num, 0, DEFAULT_SIZE);
-        ImGui::InputInt("Planes Number", &planes_num, 0, PLANES_SIZE);
-        ImGui::InputInt("Cones Number", &cones_num, 0, DEFAULT_SIZE);
-        ImGui::End();
-
-        ImGui::Begin("Figure Window");
-        ImGui::SliderFloat("Sphere Radius", &SphereRadius, 0, MAX_RADIUS);
-        ImGui::InputInt("Sphere X", &SphereX, -MAX_COORD, MAX_COORD);
-        ImGui::InputInt("Sphere Y", &SphereY, -MAX_COORD, MAX_COORD);
-        ImGui::InputInt("Sphere Z", &SphereZ, -MAX_COORD, MAX_COORD);
-       
-
-        if (ImGui::BeginCombo("Sphere material", current_status)) // The second parameter is the label previewed before opening the combo.
+        if(ImGui::CollapsingHeader("Spheres"))
         {
-            for (int n = 0; n < IM_ARRAYSIZE(status); n++)
-            {
-                bool is_selected = (current_status == status[n]); // You can store your selection however you want, outside or inside your objects
-                if (ImGui::Selectable(status[n], is_selected))
-                    current_status = status[n];
-                if (is_selected)
-                    ImGui::SetItemDefaultFocus();   // You may set the initial focus when opening the combo (scrolling + for keyboard navigation support)
-            }
-            ImGui::EndCombo();
-        }
+        
+            ImGui::InputInt("Sphere Number", &spheres_num, 0, DEFAULT_SIZE);
+            ImGui::SliderFloat("Sphere Radius", &SphereRadius, 0, MAX_RADIUS);
+            ImGui::InputInt("Sphere X", &SphereX, -MAX_COORD, MAX_COORD);
+            ImGui::InputInt("Sphere Y", &SphereY, -MAX_COORD, MAX_COORD);
+            ImGui::InputInt("Sphere Z", &SphereZ, -MAX_COORD, MAX_COORD);
+        
 
-        ImGui::SliderFloat("Sphere Haze", &SphereHaze, 0, 1);
-        ImGui::SliderFloat("Sphere Reflection", &SphereRefraction, -1.99, 0);
-        ImGui::ColorEdit3("Color Sphere", SphereColor);
+            ImGui::RadioButton("Haze", &SphereStatus, 1); ImGui::SameLine();
+            ImGui::RadioButton("Light", &SphereStatus, 2); ImGui::SameLine();
+            ImGui::RadioButton("Reflecting", &SphereStatus, 3);
+            if(SphereStatus == 1)
+            {
+                ImGui::SliderFloat("Haze", &SphereParam, 0, 1);
+            }
+            else if(SphereStatus == 3)
+            {
+                ImGui::SliderFloat("Reflection", &antiSphereParam, 0, 1.99);
+                SphereParam = -antiSphereParam;
+            }
+            else if(SphereStatus == 2)
+            {
+                ImGui::SliderFloat("Intention", &SphereIntention, 0, 100);
+            }    
+            ImGui::ColorEdit3("Color", SphereColor);
+        
+        }
+        if(ImGui::CollapsingHeader("Boxes"))
+        {
+            ImGui::InputInt("Boxes Number", &boxes_num, 0, DEFAULT_SIZE);
+        }
+        if(ImGui::CollapsingHeader("Cylindres"))
+        {
+            ImGui::InputInt("Cyl Number", &cyl_num, 0, DEFAULT_SIZE);
+        }
+        if(ImGui::CollapsingHeader("Planes"))
+        {
+            ImGui::InputInt("Planes Number", &planes_num, 0, PLANES_SIZE);
+        }
+        if(ImGui::CollapsingHeader("Cones"))
+        {
+            ImGui::InputInt("Cones Number", &cones_num, 0, DEFAULT_SIZE);
+        }
         ImGui::End();
 
+        
         
 
        
@@ -400,10 +418,6 @@ int main() {
         spheres_col[spheres_num].y = SphereColor[1];
         spheres_col[spheres_num].z = SphereColor[2];
         spheres_col[spheres_num].w = SphereParam;
-
-        //ImGui::BeginCombo("combo", 0);
-        //ImGui::Selectable()
-        //ImGui::EndCombo();
         
 
         shader.setUniform("u_time",  u_time);                 
