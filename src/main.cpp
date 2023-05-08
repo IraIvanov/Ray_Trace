@@ -11,8 +11,11 @@
 #include <cmath>
 #include <random>
 
+#define MAX_RADIUS 10
+#define MAX_COORD 100
+
 int main() {
-    sf::RenderWindow window ( sf::VideoMode( WIDTH, HIGHT ), "RayTrace window");
+    sf::RenderWindow window ( sf::VideoMode( WIDTH, HIGHT ), "RayTrace window", sf::Style::Fullscreen );
     ImGui::SFML::Init(window);
     window.setFramerateLimit(MAX_FPS);
     window.setVerticalSyncEnabled( false ); // Vsync Disabled
@@ -49,7 +52,8 @@ int main() {
     int mouse_move_x = 0;
     int mouse_move_y = 0;
 
-    bool switcher = true;
+    bool switcherLcontrol = true;
+    bool switcherEscape = false;
 
     //bool ControlKeys[CONTROL_KEYS_NUM] = { false };
 
@@ -173,19 +177,24 @@ int main() {
 
 
 
-    sf::Vector3f camera_positoin( 0.f, 0.f, 0.f );
+    sf::Vector3f camera_position( 0.f, 0.f, 0.f );
+    sf::Vector3f camera_movement( 0.f, 0.f, 0.f );
 
-    sf::Mouse::setPosition( sf::Vector2i( WIDTH/2, HIGHT/2 ), window );
+    float SphereRadius = 1;
+    int SphereX = 0;
+    int SphereY = 0;
+    int SphereZ = 0;
+    float SphereHaze = 0;
+    float SphereRefraction = 0;
+    float SphereParam = 1;
+    float SphereColor[3] = {(float)204/ 255, (float)77/ 255, (float)5/ 255 };
+
+    const char* status[] = {"Haze", "Light", "Usual"};
+    static const char* current_status = NULL;
+    
+
     window.setActive(true);
 
-
-    bool SpheresExist = true;
-    bool BoxesExist = true;
-    bool PlanesExist = true;
-    bool ConesExist = true;
-    bool CylExist = true;
-    sf::Color bgColor;
-    float color[3] = { 0.f, 0.f, 0.f };
 
     while( window.isOpen() ) { // main loop
 
@@ -201,22 +210,23 @@ int main() {
                     window.close();
                     break;
                 case ( sf::Event::MouseMoved ):
-                    
-                    //mouse_x += event.mouseMove.x - WIDTH/2;
-                    //mouse_y += event.mouseMove.y - HIGHT/2; 
+
+                    if(switcherEscape)
+                        break; 
                     current_mouse_pos = sf::Mouse::getPosition();
                     mouse_move_x = ( current_mouse_pos.x - mouse_pos.x );
                     mouse_move_y = ( current_mouse_pos.y - mouse_pos.y );
                     mouse_x += mouse_move_x;
-                    mouse_y += mouse_move_y;
-                    
-                    /*
-                    if ( abs( current_mouse_pos.x ) > 100 || abs( current_mouse_pos.y ) > 100 )
-                        sf::Mouse::setPosition( sf::Vector2i( WIDTH/2, HIGHT/2 ), window );
-                    */
-                   
+                    mouse_y += mouse_move_y;                    
+
                     mouse_pos = current_mouse_pos;
-                    
+
+                    if ( abs( current_mouse_pos.x - WIDTH/2 ) > 10 ) {
+                        
+                        sf::Mouse::setPosition( sf::Vector2i( WIDTH/2, HIGHT/2 ), window );
+                        mouse_pos = sf::Vector2i( WIDTH/2, HIGHT/2 );
+                    }
+
                     if ( mouse_move_x != 0 || mouse_move_y != 0 )
                         FrameStill = 1;
                     
@@ -228,42 +238,42 @@ int main() {
                         
                         case( sf::Keyboard::W ): 
 
-                            camera_positoin.x += WALKING_PACE;
+                            camera_movement.x = WALKING_PACE;
                             FrameStill = 1;
 
                             break;
 
                         case( sf::Keyboard::A ): 
 
-                            camera_positoin.y -= WALKING_PACE;
+                            camera_movement.y = -WALKING_PACE;
                             FrameStill = 1;
 
                             break;
                         
                         case( sf::Keyboard::S ): 
 
-                            camera_positoin.x -= WALKING_PACE;
+                            camera_movement.x = -WALKING_PACE;
                             FrameStill = 1;
 
                             break;
 
                         case( sf::Keyboard::D ): 
 
-                            camera_positoin.y += WALKING_PACE;
+                            camera_movement.y = WALKING_PACE;
                             FrameStill = 1;
 
                             break;
 
                         case( sf::Keyboard::Up ): 
 
-                            camera_positoin.z -= WALKING_PACE;
+                            camera_movement.z = -WALKING_PACE;
                             FrameStill = 1;
 
                             break;
 
                         case( sf::Keyboard::Down ): 
 
-                            camera_positoin.z +=WALKING_PACE;
+                            camera_movement.z = WALKING_PACE;
                             FrameStill = 1;
 
                             break;
@@ -284,23 +294,36 @@ int main() {
 
                         case ( sf::Keyboard::LControl ):
 
-                            if ( switcher == true ) {
+                            if ( switcherLcontrol == true ) {
 
                                 shader.loadFromFile( "./src/raycast.frag", sf::Shader::Fragment );
                                 shader.setUniform( "u_resolution", sf::Vector2f( WIDTH, HIGHT ) );
-                                switcher = false;
+                                switcherLcontrol = false;
 
                             } else {
 
                                     shader.loadFromFile( "./src/raytracing.frag", sf::Shader::Fragment );
                                     shader.setUniform( "u_resolution", sf::Vector2f( WIDTH, HIGHT ) ); 
-                                    switcher = true;
+                                    switcherLcontrol = true;
                                     FrameStill = 1;
 
                             }
 
                             break;
 
+                        case ( sf::Keyboard::Escape ):
+
+                            if ( switcherEscape == false ) {
+
+                                //on pause
+                                switcherEscape = true;
+
+                            } else {
+                                
+                                //leave pause
+                                switcherEscape = false;
+
+                            }
                             
 
                         default:
@@ -318,29 +341,73 @@ int main() {
         ImGui::SFML::Update(window, clock.restart()); 
 
 
-        float res_mouse_x =  float(mouse_x) / WIDTH - 0.5f; 
-        float res_mouse_y =  float(mouse_y) / HIGHT - 0.5f;
+        float res_mouse_x =  (float(mouse_x) / WIDTH - 0.5f) * MOUSE_SENSITIVITY; 
+        float res_mouse_y =  (float(mouse_y) / HIGHT - 0.5f) * MOUSE_SENSITIVITY;
         window.setActive();
-        shader.setUniform("u_mouse",  sf::Vector2f(res_mouse_x * MOUSE_SENSITIVITY, res_mouse_y * MOUSE_SENSITIVITY ) );
+        shader.setUniform("u_mouse",  sf::Vector2f(res_mouse_x, res_mouse_y) );
+
+        camera_position.x += camera_movement.x * cos(res_mouse_x) - camera_movement.y * sin(res_mouse_x);
+        camera_position.y += camera_movement.x * sin(res_mouse_x) + camera_movement.y * cos(res_mouse_x);
+        camera_movement.x = 0.f;
+        camera_movement.y = 0.f;
 
         time = clock.getElapsedTime();
         float u_time = time.asSeconds();
-        
-//--------------IMGUI SETTINGS WINDOW START ---------------------
+
+
         ImGui::Begin("Settings Window");
-        if (ImGui::ColorEdit3("SMTH Color", color)) 
-        {
-            //add color settings for figures
-        }
-        ImGui::Checkbox("Spheres", &SpheresExist);
-        ImGui::Checkbox("Boxes", &BoxesExist);
-        ImGui::Checkbox("Cones", &ConesExist);
-        ImGui::Checkbox("Cyl", &CylExist);
+        ImGui::InputInt("Spheres Number", &spheres_num, 0, DEFAULT_SIZE);
+        ImGui::InputInt("Boxes Number", &boxes_num, 0, DEFAULT_SIZE);
+        ImGui::InputInt("Cyl Number", &cyl_num, 0, DEFAULT_SIZE);
+        ImGui::InputInt("Planes Number", &planes_num, 0, PLANES_SIZE);
+        ImGui::InputInt("Cones Number", &cones_num, 0, DEFAULT_SIZE);
         ImGui::End();
-//-----------------IMGUI SETTINGS WINDOW END -----------------
+
+        ImGui::Begin("Figure Window");
+        ImGui::SliderFloat("Sphere Radius", &SphereRadius, 0, MAX_RADIUS);
+        ImGui::InputInt("Sphere X", &SphereX, -MAX_COORD, MAX_COORD);
+        ImGui::InputInt("Sphere Y", &SphereY, -MAX_COORD, MAX_COORD);
+        ImGui::InputInt("Sphere Z", &SphereZ, -MAX_COORD, MAX_COORD);
+       
+
+        if (ImGui::BeginCombo("Sphere material", current_status)) // The second parameter is the label previewed before opening the combo.
+        {
+            for (int n = 0; n < IM_ARRAYSIZE(status); n++)
+            {
+                bool is_selected = (current_status == status[n]); // You can store your selection however you want, outside or inside your objects
+                if (ImGui::Selectable(status[n], is_selected))
+                    current_status = status[n];
+                if (is_selected)
+                    ImGui::SetItemDefaultFocus();   // You may set the initial focus when opening the combo (scrolling + for keyboard navigation support)
+            }
+            ImGui::EndCombo();
+        }
+
+        ImGui::SliderFloat("Sphere Haze", &SphereHaze, 0, 1);
+        ImGui::SliderFloat("Sphere Reflection", &SphereRefraction, -1.99, 0);
+        ImGui::ColorEdit3("Color Sphere", SphereColor);
+        ImGui::End();
+
+        
+
+       
+
+        spheres_pos[spheres_num].w = SphereRadius;
+        spheres_pos[spheres_num].x = SphereX;
+        spheres_pos[spheres_num].y = SphereY;
+        spheres_pos[spheres_num].z = SphereZ;
+        spheres_col[spheres_num].x = SphereColor[0];
+        spheres_col[spheres_num].y = SphereColor[1];
+        spheres_col[spheres_num].z = SphereColor[2];
+        spheres_col[spheres_num].w = SphereParam;
+
+        //ImGui::BeginCombo("combo", 0);
+        //ImGui::Selectable()
+        //ImGui::EndCombo();
+        
 
         shader.setUniform("u_time",  u_time);                 
-        shader.setUniform("u_camera_pos", camera_positoin );
+        shader.setUniform("u_camera_pos", camera_position );
         shader.setUniform("u_sample_part", 1.0f / FrameStill) ;
         shader.setUniform("u_seed1", sf::Vector2f((float)dist(e2), (float)dist(e2)) * 999.0f);
 		shader.setUniform("u_seed2", sf::Vector2f((float)dist(e2), (float)dist(e2)) * 999.0f);
@@ -360,7 +427,8 @@ int main() {
         shader.setUniformArray( "cyl_col", cyl_col, DEFAULT_SIZE );
         shader.setUniform( "ulight_pos", ulight_pos );
 
-        if ( switcher == true ) {
+
+        if ( switcherLcontrol == true ) {
 
             if ( FrameStill % 2 == 1 ) {
 
