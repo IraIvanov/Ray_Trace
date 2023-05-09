@@ -18,11 +18,16 @@
 #define MAX_SMOOTH 100
 
 int main() {
-    sf::RenderWindow window(sf::VideoMode(WIDTH, HIGHT), "RayTrace window",
-                            sf::Style::Fullscreen);
+    sf::RenderWindow window(sf::VideoMode(WIDTH, HIGHT), "RayTrace",
+                            sf::Style::Fullscreen,
+                            sf::ContextSettings(0, 0, 0));
     ImGui::SFML::Init(window);
     window.setFramerateLimit(MAX_FPS);
-    window.setVerticalSyncEnabled(false); // Vsync Disabled
+    window.setVerticalSyncEnabled(false);
+
+    glEnable(GL_MULTISAMPLE_ARB);
+
+    window.setMouseCursorVisible(false);
 
     sf::Shader shader;
 
@@ -209,6 +214,8 @@ int main() {
 
     window.setActive(true);
 
+    window.setMouseCursorVisible(switcherEscape);
+
     while (window.isOpen()) { // main loop
 
         sf::Event event;
@@ -297,11 +304,11 @@ int main() {
 
                     case ( sf::Keyboard::Num1 ):
 
-                        spheres_col[spheres_num] = sf::Glsl::Vec4( 0.1f, 0.7f,
-                    0.5f, 1.f ); spheres_pos[spheres_num] = sf::Glsl::Vec4(
-                    -camera_positoin.x, -camera_positoin.y,
-                    camera_positoin.z, 1.f ); spheres_num = (spheres_num + 1) %
-                    DEFAULT_SIZE; FrameStill = 1;
+                        spheres_col[spheres_num] = sf::Glsl::Vec4( 0.1f,
+                    0.7f, 0.5f, 1.f ); spheres_pos[spheres_num] =
+                    sf::Glsl::Vec4( -camera_positoin.x, -camera_positoin.y,
+                    camera_positoin.z, 1.f ); spheres_num = (spheres_num +
+                    1) % DEFAULT_SIZE; FrameStill = 1;
 
                         break;
 
@@ -428,22 +435,23 @@ int main() {
                 ImGui::SliderFloat("Width", &BoxWi, 0, MAX_RADIUS);
                 ImGui::InputInt3("Coord", BoxCoord);
 
-                // ImGui::RadioButton("Haze", &BoxStatus, 1); ImGui::SameLine();
-                // ImGui::RadioButton("Light", &BoxStatus, 2);
-                // ImGui::SameLine(); ImGui::RadioButton("Reflection",
-                // &BoxStatus, 3);
+                // ImGui::RadioButton("Haze", &BoxStatus, 1);
+                // ImGui::SameLine(); ImGui::RadioButton("Light",
+                // &BoxStatus, 2); ImGui::SameLine();
+                // ImGui::RadioButton("Reflection", &BoxStatus, 3);
                 // if(BoxStatus == 1)
                 // {
                 //     ImGui::SliderFloat("Haze", &BoxParam, 0, 1);
                 // }
                 // else if(BoxStatus == 3)
                 // {
-                //     ImGui::SliderFloat("Reflection", &antiBoxParam, 0, 1.99);
-                //     BoxParam = -antiBoxParam;
+                //     ImGui::SliderFloat("Reflection", &antiBoxParam,
+                //     0, 1.99); BoxParam = -antiBoxParam;
                 // }
                 // else if(BoxStatus == 2)
                 // {
-                //     ImGui::SliderFloat("Intention", &BoxIntention, 0, 100);
+                //     ImGui::SliderFloat("Intention", &BoxIntention, 0,
+                //     100);
                 // }
                 ImGui::ColorEdit3("Color", BoxColor);
             }
@@ -553,7 +561,7 @@ int main() {
         shader.setUniformArray("cyl_up_point", cyl_up_point, DEFAULT_SIZE);
         shader.setUniformArray("cyl_col", cyl_col, DEFAULT_SIZE);
         shader.setUniform("ulight_pos", ulight_pos);
-
+        // window.setMouseCursorVisible(switcherEscape);
         if (switcherLcontrol == true) {
 
             if (FrameStill % 2 == 1) {
