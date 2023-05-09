@@ -177,15 +177,20 @@ int main() {
         cyl_col[i] = sf::Glsl::Vec4(0.f, 0.f, 0.f, 0.f);
     }
 
-    float SphereRadius = 1;
+    float SphereRadius = 0;
     float SphereCoord[3] = {};
     float SphereParam = 1;
     float antiSphereParam = -1;
     int SphereStatus = 0;
     float SphereIntention = 0;
     float SphereColor[3] = {(float)204 / 255, (float)77 / 255, (float)5 / 255};
+    
+    float SunCoord[3];
+    SunCoord[0] = ulight_pos.x;
+    SunCoord[1] = ulight_pos.y;
+    SunCoord[2] = ulight_pos.z;
 
-    float BoxSize[3] = {1, 1, 1};
+    float BoxSize[3] = {0, 0, 0};
     float BoxCoord[3] = {};
     float BoxParam = 1;
     float antiBoxParam = -1;
@@ -193,7 +198,7 @@ int main() {
     float BoxIntention = 0;
     float BoxColor[3] = {(float)204 / 255, (float)77 / 255, (float)5 / 255};
 
-    float CylRadius = 1;
+    float CylRadius =01;
     float CylX[2] = {};
     float CylY[2] = {};
     float CylZ[2] = {};
@@ -210,7 +215,7 @@ int main() {
     float PlaneIntention = 0;
     float PlaneColor[3] = {(float)204 / 255, (float)77 / 255, (float)5 / 255};
 
-    float ConeRadius[2] = {1, 2};
+    float ConeRadius[2] = {0, 0};
     float ConeX[2] = {};
     float ConeY[2] = {};
     float ConeZ[2] = {};
@@ -226,10 +231,10 @@ int main() {
 
     ImGui::SFML::Init(window);
 
-    spheres_num = -1;
-    cones_num = -1;
-    cyl_num = -1;
-    boxes_num = -1;
+    spheres_num = 0;
+    cones_num = 0;
+    cyl_num = 0;
+    boxes_num = 0;
     planes_num = 1;
 
     while (window.isOpen()) {  // main lopp
@@ -456,13 +461,14 @@ int main() {
                     SphereCoord[1] = spheres_pos[spheres_num].y;
                     SphereCoord[2] = spheres_pos[spheres_num].z;
                     ImGui::InputFloat3("Coord", SphereCoord);
+                    
 
                     ImGui::RadioButton("Haze", &SphereStatus, 1);
                     ImGui::SameLine();
                     ImGui::RadioButton("Light", &SphereStatus, 2);
                     ImGui::SameLine();
                     ImGui::RadioButton("Reflection", &SphereStatus, 3);
-                    SphereParam = spheres_col[spheres_num].w;
+                    
                     if (SphereStatus == 1) {
                         ImGui::SliderFloat("Haze", &SphereParam, 0, 1);
                     } else if (SphereStatus == 3) {
@@ -479,6 +485,7 @@ int main() {
                     SphereColor[2] = spheres_col[spheres_num].z;
                     ImGui::ColorEdit3("Color", SphereColor);
                     ImGui::SeparatorText("Sun Light Slider:");
+                    ImGui::InputFloat3("Sun Coord", SunCoord);
                     ImGui::SliderFloat("Light", &sun_brightness, 0, 1);
                     ImGui::TreePop();
                 }
@@ -686,6 +693,9 @@ int main() {
             spheres_col[spheres_num].y = SphereColor[1];
             spheres_col[spheres_num].z = SphereColor[2];
             spheres_col[spheres_num].w = SphereParam;
+            ulight_pos.x = SunCoord[0];
+            ulight_pos.y = SunCoord[1];
+            ulight_pos.z = SunCoord[2];
 
             boxes_pos[boxes_num].x = BoxCoord[0];
             boxes_pos[boxes_num].y = BoxCoord[1];
