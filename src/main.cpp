@@ -115,24 +115,7 @@ int main() {
 
     int spheres_num = 0;
 
-    for (int i = 0; i < 10; i++) {
-        spheres_pos[i] = sf::Glsl::Vec4(0.f, -4.f + -2.f * i, 0.f, 1.f);
-        spheres_col[i] = sf::Glsl::Vec4(0.4, 0.5, 0.8, 0.1 * i);
-    }
-
-    spheres_pos[10] = sf::Glsl::Vec4(4.f, -4.f, 2.f, 0.75f);
-    spheres_col[10] = sf::Glsl::Vec4(1.f, 0.2, 0.1, 1.f);
-
-    spheres_pos[11] = sf::Glsl::Vec4(4.f, 0.f, 0.f, 1.f);
-    spheres_col[11] = sf::Glsl::Vec4(1.f, 1.f, 1.f, -2.f);
-
-    spheres_pos[12] = sf::Glsl::Vec4(-4.f, 0.f, 0.f, 1.f);
-    spheres_col[12] = sf::Glsl::Vec4(1.f, 1.f, 1.f, 0.f);
-
-    spheres_pos[13] = sf::Glsl::Vec4(10.f, 0.f, 0.f, 1.f);
-    spheres_col[13] = sf::Glsl::Vec4(1.f, 1.f, 1.f, -1.5);
-
-    for (int i = 14; i < DEFAULT_SIZE; i++) {
+    for (int i = 0; i < DEFAULT_SIZE; i++) {
         spheres_pos[i] = sf::Glsl::Vec4(0.f, 0.f, 0.f, 0.f);
         spheres_col[i] = sf::Glsl::Vec4(0.f, 0.f, 0.f, 0.f);
     }
@@ -150,14 +133,6 @@ int main() {
         boxes_col[i] = sf::Glsl::Vec4(0.f, 0.f, 0.f, 0.f);
         boxes_size[i] = sf::Glsl::Vec3(0.f, 0.f, 0.f);
     }
-
-    boxes_pos[0] = sf::Glsl::Vec3(4.f, -4.f, 0.f);
-    boxes_size[0] = sf::Glsl::Vec3(1.f, 1.f, 1.f);
-    boxes_col[0] = sf::Glsl::Vec4(0.4, 0.6, 0.8, 1.f);
-
-    boxes_pos[1] = sf::Glsl::Vec3(4.f, -10.f, 0.f);
-    boxes_size[1] = sf::Glsl::Vec3(1.f, 1.f, 1.f);
-    boxes_col[1] = sf::Glsl::Vec4(0.6, 0.4, 0.5, 0.8);
 
     // plane settings
 
@@ -188,10 +163,6 @@ int main() {
         cones_col[i] = sf::Glsl::Vec4(0.f, 0.f, 0.f, 0.f);
     }
 
-    cones_down_point[0] = sf::Glsl::Vec4(4.f, 4.f, 1.f, 1.f);
-    cones_up_point[0] = sf::Glsl::Vec4(4.f, 4.f, -2.f, 0.f);
-    cones_col[0] = sf::Glsl::Vec4(1.f, 0.4, 0.6, 0.f);
-
     sf::Glsl::Vec3 cyl_down_point[DEFAULT_SIZE];
     sf::Glsl::Vec4 cyl_up_point[DEFAULT_SIZE];
     sf::Glsl::Vec4 cyl_col[DEFAULT_SIZE];
@@ -205,10 +176,6 @@ int main() {
         cyl_up_point[i] = sf::Glsl::Vec4(0.f, 0.f, 0.f, 0.f);
         cyl_col[i] = sf::Glsl::Vec4(0.f, 0.f, 0.f, 0.f);
     }
-
-    cyl_down_point[0] = sf::Glsl::Vec3(4.f, 8.f, 1.f);
-    cyl_up_point[0] = sf::Glsl::Vec4(4.f, 8.f, -2.f, 0.5);
-    cyl_col[0] = sf::Glsl::Vec4(0.1, 0.6, 0.7, 1.f);
 
     float SphereRadius = 1;
     float SphereCoord[3] = {};

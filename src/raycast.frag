@@ -48,7 +48,7 @@ vec3 GetSky( vec3 rd, vec3 light_pos ) {
     vec3 sky_col = vec3( 0.3, 0.6, 1.0 ); //blue skyes
     vec3 sun = vec3( 0.95, 0.9, 1.0 ); // sun
     sun *= pow ( max( 0.0, dot(rd, -light_pos) ), 32.0 );
-    return clamp( sun + sky_col*sun_brightness, 0.0 , 1.0  );
+    return clamp( (sun + sky_col)*sun_brightness, 0.0 , 1.0  );
 
 }
 
@@ -216,8 +216,8 @@ vec3 CastRay( inout vec3 ro, inout vec3 rd, vec3 light_pos ) {
 
         if ( cones_up_point[i].w < eps && cones_down_point[i].w < eps ) continue;
 
-        pa = cones_down_point[i].xyz;
-        pb = cones_up_point[i].xyz;
+        pa = -cones_down_point[i].xyz;
+        pb = -cones_up_point[i].xyz;
         ra = cones_down_point[i].w;
         rb = cones_up_point[i].w;
 
@@ -241,8 +241,8 @@ vec3 CastRay( inout vec3 ro, inout vec3 rd, vec3 light_pos ) {
 
         if ( cyl_up_point[i].w < eps ) continue;
 
-        a = cyl_up_point[i].xyz;
-        b = cyl_down_point[i];
+        a = -cyl_up_point[i].xyz;
+        b = -cyl_down_point[i];
         r = cyl_up_point[i].w;
 
         temp_inter = vec2( cylIntersect( ro, rd, a, b, r) );
