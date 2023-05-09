@@ -1,7 +1,7 @@
 #ifndef CONFIG_H_INCLUDED
 #define CONFIG_H_INCLUDED
 
-#define HIGHT 1080  
+#define HIGHT 1080
 #define WIDTH 1920
 #define MAX_FPS 60
 #define MOUSE_SENSITIVITY 3.f
@@ -12,7 +12,7 @@
 #define DEFAULT_SIZE 15
 #define PLANES_SIZE 5
 
-enum Control_Keys{
+enum Control_Keys {
 
     W = 0,
     A = 1,
@@ -22,7 +22,5 @@ enum Control_Keys{
     Down = 5,
 
 };
-
-
 
 #endif
