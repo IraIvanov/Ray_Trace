@@ -19,9 +19,9 @@
     ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoBackground | \
         ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | \
         ImGuiWindowFlags_NoMove
-#define ImGuiSettingsFlags                                   \
-    ImGuiWindowFlags_MenuBar | \
-        ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize
+#define ImGuiSettingsFlags                               \
+    ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoMove | \
+        ImGuiWindowFlags_NoResize
 
 int main() {
     // window and graphics settings
@@ -93,7 +93,7 @@ int main() {
     bool show_smooth = false;
     bool show_resolution = false;
     bool quit = false;
-    
+
     int style_idx = 0;
 
     // random settings
@@ -253,10 +253,9 @@ int main() {
     float ConeIntention = 0;
     float ConeColor[3] = {(float)204 / 255, (float)77 / 255, (float)5 / 255};
 
-   
-
     sf::Clock fps_clock;
     int frame_counter = 0;
+    int fps_print = 0;
     sf::Time delta_time;
 
     ImGui::SFML::Init(window);
@@ -405,19 +404,17 @@ int main() {
         time = clock.getElapsedTime();
         float u_time = time.asSeconds();
 
-        if(switcherEscape)
-        {
+        if (switcherEscape) {
             ImGui::SetNextWindowSize(
                 ImVec2(598, 555));                  //, ImGuiCond_FirstUseEver);
             ImGui::SetNextWindowPos(ImVec2(0, 0));  //, ImGuiCond_FirstUseEver);
             ImGui::Begin("Settings Window", NULL, ImGuiSettingsFlags);
 
-            
             if (ImGui::BeginMenuBar()) {
                 if (ImGui::BeginMenu("Appearance")) {
                     if (ImGui::BeginMenu("Switch Theme")) {
                         ImGui::Combo("Theme", &style_idx,
-                                    "Dark\0Light\0Classic\0\0");
+                                     "Dark\0Light\0Classic\0\0");
                         switch (style_idx) {
                             case 0:
                                 ImGui::StyleColorsDark();
@@ -431,17 +428,16 @@ int main() {
                         }
                         ImGui::EndMenu();
                     }
-                    if(ImGui::BeginMenu("Switch Font"))
-                    {
+                    if (ImGui::BeginMenu("Switch Font")) {
                         ImGui::ShowFontSelector("Fonts##Selector");
-                        
+
                         ImGui::EndMenu();
                     }
 
                     ImGui::MenuItem("Quit", NULL, &quit);
-                    if(quit)
+                    if (quit)
                         window.close();
-                        
+
                     ImGui::EndMenu();
                 }
                 if (ImGui::BeginMenu("Data")) {
@@ -452,17 +448,17 @@ int main() {
                 if (ImGui::BeginMenu("Credits")) {
                     if (ImGui::BeginMenu("AWES0MESLAYER")) {
                         ImGui::TextColored(ImVec4(1.0f, 0.0f, 1.0f, 1.0f),
-                                        "MOST HATED");
+                                           "MOST HATED");
                         ImGui::EndMenu();
                     }
                     if (ImGui::BeginMenu("OLE G")) {
                         ImGui::TextColored(ImVec4(0.7f, 0.5f, 1.0f, 0.8f),
-                                        "EGG FRYER");
+                                           "EGG FRYER");
                         ImGui::EndMenu();
                     }
                     if (ImGui::BeginMenu("IraIvanov")) {
                         ImGui::TextColored(ImVec4(0.9f, 0.35f, 0.34f, 0.99f),
-                                        "$ad boy");
+                                           "$ad boy");
                         ImGui::EndMenu();
                     }
                     ImGui::EndMenu();
@@ -498,11 +494,13 @@ int main() {
                     if (SphereStatus == 1) {
                         ImGui::SliderFloat("Haze", &SphereParam, 0, 1);
                     } else if (SphereStatus == 3) {
-                        ImGui::SliderFloat("Reflection", &antiSphereParam, 0, 1.99);
+                        ImGui::SliderFloat("Reflection", &antiSphereParam, 0,
+                                           1.99);
                         SphereParam = -antiSphereParam;
                     } else if (SphereStatus == 2) {
                         SphereParam = -2;
-                        ImGui::SliderFloat("Intention", &SphereIntention, 0, 100);
+                        ImGui::SliderFloat("Intention", &SphereIntention, 0,
+                                           100);
                     }
                     SphereColor[0] = spheres_col[spheres_num].x;
                     SphereColor[1] = spheres_col[spheres_num].y;
@@ -521,7 +519,8 @@ int main() {
                     BoxSize[0] = boxes_size[boxes_num].x;
                     BoxSize[1] = boxes_size[boxes_num].y;
                     BoxSize[2] = boxes_size[boxes_num].z;
-                    ImGui::SliderFloat3("Len Height Width", BoxSize, 0, MAX_RADIUS);
+                    ImGui::SliderFloat3("Len Height Width", BoxSize, 0,
+                                        MAX_RADIUS);
                     BoxCoord[0] = boxes_pos[boxes_num].x;
                     BoxCoord[1] = boxes_pos[boxes_num].y;
                     BoxCoord[2] = boxes_pos[boxes_num].z;
@@ -537,7 +536,8 @@ int main() {
                     if (BoxStatus == 1) {
                         ImGui::SliderFloat("Haze", &BoxParam, 0, 1);
                     } else if (BoxStatus == 3) {
-                        ImGui::SliderFloat("Reflection", &antiBoxParam, 0, 1.99);
+                        ImGui::SliderFloat("Reflection", &antiBoxParam, 0,
+                                           1.99);
                         BoxParam = -antiBoxParam;
                     } else if (BoxStatus == 2) {
                         BoxParam = -2;
@@ -568,7 +568,6 @@ int main() {
                     ImGui::InputFloat2("Up and Down Y", CylY);
                     ImGui::InputFloat2("Up and Down Z", CylZ);
 
-
                     ImGui::RadioButton("Haze", &CylStatus, 1);
                     ImGui::SameLine();
                     ImGui::RadioButton("Light", &CylStatus, 2);
@@ -579,7 +578,8 @@ int main() {
                     if (CylStatus == 1) {
                         ImGui::SliderFloat("Haze", &CylParam, 0, 1);
                     } else if (CylStatus == 3) {
-                        ImGui::SliderFloat("Reflection", &antiCylParam, 0, 1.99);
+                        ImGui::SliderFloat("Reflection", &antiCylParam, 0,
+                                           1.99);
                         CylParam = -antiCylParam;
                     } else if (CylStatus == 2) {
                         BoxParam = -2;
@@ -604,7 +604,6 @@ int main() {
                     NormCoord[2] = planes_norm[planes_num].z;
                     ImGui::InputFloat3("Norm Coord", NormCoord);
 
-
                     ImGui::RadioButton("Haze", &PlaneStatus, 1);
                     ImGui::SameLine();
                     ImGui::RadioButton("Light", &PlaneStatus, 2);
@@ -615,7 +614,8 @@ int main() {
                     if (PlaneStatus == 1) {
                         ImGui::SliderFloat("Haze", &PlaneParam, 0, 1);
                     } else if (PlaneStatus == 3) {
-                        ImGui::SliderFloat("Reflection", &antiPlaneParam, 0, 1.99);
+                        ImGui::SliderFloat("Reflection", &antiPlaneParam, 0,
+                                           1.99);
                         PlaneParam = -antiPlaneParam;
                     } else if (PlaneStatus == 2) {
                         BoxParam = -2;
@@ -637,7 +637,8 @@ int main() {
                         cones_num = 0;
                     ConeRadius[0] = cones_up_point[cones_num].w;
                     ConeRadius[1] = cones_down_point[cones_num].w;
-                    ImGui::SliderFloat2("Up and down Radius", ConeRadius, 0, MAX_RADIUS);
+                    ImGui::SliderFloat2("Up and down Radius", ConeRadius, 0,
+                                        MAX_RADIUS);
 
                     ConeX[0] = cones_up_point[cones_num].x;
                     ConeY[0] = cones_up_point[cones_num].y;
@@ -649,7 +650,6 @@ int main() {
                     ImGui::InputFloat2("Up and Down Y", ConeY);
                     ImGui::InputFloat2("Up and Down Z", ConeZ);
 
-
                     ImGui::RadioButton("Haze", &ConeStatus, 1);
                     ImGui::SameLine();
                     ImGui::RadioButton("Light", &ConeStatus, 2);
@@ -660,7 +660,8 @@ int main() {
                     if (ConeStatus == 1) {
                         ImGui::SliderFloat("Haze", &ConeParam, 0, 1);
                     } else if (ConeStatus == 3) {
-                        ImGui::SliderFloat("Reflection", &antiConeParam, 0, 1.99);
+                        ImGui::SliderFloat("Reflection", &antiConeParam, 0,
+                                           1.99);
                         ConeParam = -antiConeParam;
                     } else if (ConeStatus == 2) {
                         BoxParam = -2;
@@ -687,7 +688,6 @@ int main() {
                 ImGui::Checkbox("VSYNC", &switcherVsync);
             }
             ImGui::End();
-            
 
             if (show_fps) {
                 ImGui::SetNextWindowSize(
@@ -695,7 +695,7 @@ int main() {
                 ImGui::SetNextWindowPos(
                     ImVec2(1840, 5));  //, ImGuiCond_FirstUseEver);
                 ImGui::Begin("FPS", NULL, ImGuiFPSFlags);
-                ImGui::Text("FPS: %d", frame_counter); //edit to frame_print
+                ImGui::Text("FPS: %d", fps_print);  // edit to frame_print
                 ImGui::End();
             }
             if (show_resolution) {
@@ -759,12 +759,12 @@ int main() {
             cones_col[cones_num].z = ConeColor[2];
             cones_col[cones_num].w = ConeParam;
 
-            
             window.setVerticalSyncEnabled(switcherVsync);
 
-            //window.setSize(sf::Vector2u(Resolution[0], Resolution[1])); set size with params
-            //settings.antialiasingLevel = Smooth;
-            //window.setamtianilacing ???? do it b urself -> AA level in Smooth int!
+            // window.setSize(sf::Vector2u(Resolution[0], Resolution[1])); set
+            // size with params settings.antialiasingLevel = Smooth;
+            // window.setamtianilacing ???? do it b urself -> AA level in Smooth
+            // int!
         }
 
         shader.setUniform("u_time", u_time);
@@ -818,8 +818,7 @@ int main() {
         delta_time += fps_clock.restart();
         frame_counter++;
         if (delta_time.asSeconds() >= 1.f) {
-            std::cout << "FPS: " << frame_counter << std::endl;
-
+            fps_print = frame_counter;
             frame_counter = 0;
             delta_time = sf::seconds(0.f);
         }
