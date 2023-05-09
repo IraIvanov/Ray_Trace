@@ -1,3 +1,0 @@
-/home/shorteststraw/study/Ray_Trace/CMakeFiles/rebuild_cache.dir
-/home/shorteststraw/study/Ray_Trace/CMakeFiles/edit_cache.dir
-/home/shorteststraw/study/Ray_Trace/CMakeFiles/Ray_Trace.dir

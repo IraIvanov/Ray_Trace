@@ -1,4 +1,4 @@
-#version 140
+#version 130
 
 #define DEFAULT_SIZE 15
 #define PLANES_SIZE 5
