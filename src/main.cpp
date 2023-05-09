@@ -5,13 +5,13 @@
 
 #include "../include/ImGui/imgui-SFML.h"
 #include "../include/ImGui/imgui.h"
-
 #include "../include/ImGui/imgui_demo.cpp"
 
-#include "../include/config.hpp"
 #include <cmath>
 #include <iostream>
 #include <random>
+
+#include "../include/config.hpp"
 
 #define MAX_RADIUS 10
 #define MAX_COORD 100
@@ -21,6 +21,8 @@ int main() {
     sf::RenderWindow window(sf::VideoMode(WIDTH, HIGHT), "RayTrace",
                             sf::Style::Fullscreen,
                             sf::ContextSettings(0, 0, 0));
+    window.setMouseCursorVisible(false);
+
     ImGui::SFML::Init(window);
     window.setFramerateLimit(MAX_FPS);
     window.setVerticalSyncEnabled(false);
@@ -51,15 +53,16 @@ int main() {
     sf::Clock clock;
     sf::Time time;
 
-    sf::Mouse::setPosition(sf::Vector2i(WIDTH / 2, HIGHT / 2), window);
+    // sf::Mouse::setPosition(sf::Vector2i(WIDTH / 2, HIGHT / 2), window);
     sf::Vector2i mouse_pos = sf::Mouse::getPosition();
     sf::Vector2i current_mouse_pos;
 
     int mouse_x = WIDTH / 2;
     int mouse_y = HIGHT / 2;
-    int FrameStill = 1;
     int mouse_move_x = 0;
     int mouse_move_y = 0;
+
+    int FrameStill = 1;
 
     bool switcherLcontrol = true;
     bool switcherEscape = false;
@@ -85,7 +88,6 @@ int main() {
     int spheres_num = 0;
 
     for (int i = 0; i < 10; i++) {
-
         spheres_pos[i] = sf::Glsl::Vec4(0.f, -4.f + -2.f * i, 0.f, 1.f);
         spheres_col[i] = sf::Glsl::Vec4(0.4, 0.5, 0.8, 0.1 * i);
     }
@@ -100,7 +102,6 @@ int main() {
     spheres_col[13] = sf::Glsl::Vec4(1.f, 1.f, 1.f, -1.5);
 
     for (int i = 14; i < DEFAULT_SIZE; i++) {
-
         spheres_pos[i] = sf::Glsl::Vec4(0.f, 0.f, 0.f, 0.f);
         spheres_col[i] = sf::Glsl::Vec4(0.f, 0.f, 0.f, 0.f);
     }
@@ -112,7 +113,6 @@ int main() {
     int boxes_num = 0;
 
     for (int i = 0; i < DEFAULT_SIZE; i++) {
-
         boxes_pos[i] = sf::Glsl::Vec3(0.f, 0.f, 0.f);
         boxes_col[i] = sf::Glsl::Vec4(0.f, 0.f, 0.f, 0.f);
         boxes_size[i] = sf::Glsl::Vec3(0.f, 0.f, 0.f);
@@ -133,7 +133,6 @@ int main() {
     int planes_num = 1;
 
     for (int i = 0; i < PLANES_SIZE; i++) {
-
         planes_norm[i] = sf::Glsl::Vec3(0.f, 0.f, 0.f);
         planes_col[i] = sf::Glsl::Vec4(0.f, 0.f, 0.f, 0.f);
     }
@@ -148,7 +147,6 @@ int main() {
     int cones_num = 0;
 
     for (int i = 0; i < DEFAULT_SIZE; i++) {
-
         cones_down_point[i] = sf::Glsl::Vec4(0.f, 0.f, 0.f, 0.f);
         cones_up_point[i] = sf::Glsl::Vec4(0.f, 0.f, 0.f, 0.f);
         cones_col[i] = sf::Glsl::Vec4(0.f, 0.f, 0.f, 0.f);
@@ -165,7 +163,6 @@ int main() {
     int cyl_num = 0;
 
     for (int i = 0; i < DEFAULT_SIZE; i++) {
-
         cyl_down_point[i] = sf::Glsl::Vec3(0.f, 0.f, 0.f);
         cyl_up_point[i] = sf::Glsl::Vec4(0.f, 0.f, 0.f, 0.f);
         cyl_col[i] = sf::Glsl::Vec4(0.f, 0.f, 0.f, 0.f);
@@ -214,7 +211,9 @@ int main() {
 
     window.setActive(true);
 
-    window.setMouseCursorVisible(switcherEscape);
+    sf::Clock fps_clock;
+    int frame_counter = 0;
+    sf::Time delta_time;
 
     while (window.isOpen()) { // main loop
 
@@ -233,6 +232,7 @@ int main() {
 
                 if (switcherEscape)
                     break;
+
                 current_mouse_pos = sf::Mouse::getPosition();
                 mouse_move_x = (current_mouse_pos.x - mouse_pos.x);
                 mouse_move_y = (current_mouse_pos.y - mouse_pos.y);
@@ -299,21 +299,6 @@ int main() {
 
                     break;
 
-                    // example of an spawn logic
-                    /*
-
-                    case ( sf::Keyboard::Num1 ):
-
-                        spheres_col[spheres_num] = sf::Glsl::Vec4( 0.1f,
-                    0.7f, 0.5f, 1.f ); spheres_pos[spheres_num] =
-                    sf::Glsl::Vec4( -camera_positoin.x, -camera_positoin.y,
-                    camera_positoin.z, 1.f ); spheres_num = (spheres_num +
-                    1) % DEFAULT_SIZE; FrameStill = 1;
-
-                        break;
-
-                    */
-
                 case (sf::Keyboard::LControl):
 
                     if (switcherLcontrol == false) {
@@ -366,6 +351,7 @@ int main() {
 
         float res_mouse_x = (float(mouse_x) / WIDTH - 0.5f) * MOUSE_SENSITIVITY;
         float res_mouse_y = (float(mouse_y) / HIGHT - 0.5f) * MOUSE_SENSITIVITY;
+
         window.setActive();
         shader.setUniform("u_mouse", sf::Vector2f(res_mouse_x, res_mouse_y));
 
@@ -374,6 +360,7 @@ int main() {
         camera_position.y += camera_movement.x * sin(res_mouse_x) +
                              camera_movement.y * cos(res_mouse_x);
         camera_position.z += camera_movement.z;
+
         camera_movement.x = 0.f;
         camera_movement.y = 0.f;
         camera_movement.z = 0.f;
@@ -561,24 +548,18 @@ int main() {
         shader.setUniformArray("cyl_up_point", cyl_up_point, DEFAULT_SIZE);
         shader.setUniformArray("cyl_col", cyl_col, DEFAULT_SIZE);
         shader.setUniform("ulight_pos", ulight_pos);
-        // window.setMouseCursorVisible(switcherEscape);
+
         if (switcherLcontrol == true) {
-
             if (FrameStill % 2 == 1) {
-
                 shader.setUniform("u_sample", OutTexture.getTexture());
                 FinalTexture.draw(OutSpriteFlipped, &shader);
                 window.draw(FinalSprite);
-
             } else {
-
                 shader.setUniform("u_sample", FinalTexture.getTexture());
                 OutTexture.draw(OutSpriteFlipped, &shader);
                 window.draw(OutSprite);
             }
-
         } else {
-
             shader.setUniform("u_sample", OutTexture.getTexture());
             window.draw(OutSprite, &shader);
         }
@@ -586,6 +567,15 @@ int main() {
         ImGui::SFML::Render(window);
 
         window.display();
+        delta_time += fps_clock.restart();
+        frame_counter++;
+        if (delta_time.asSeconds() >= 1.f) {
+
+            std::cout << "FPS: " << frame_counter << std::endl;
+
+            frame_counter = 0;
+            delta_time = sf::seconds(0.f);
+        }
         FrameStill++;
     }
 
