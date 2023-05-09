@@ -187,46 +187,55 @@ int main() {
     sf::Vector3f camera_movement( 0.f, 0.f, 0.f );
 
     float SphereRadius = 1;
-    int SphereCoord[3] = {};
+    float SphereCoord[3] = {};
     float SphereParam = 1;
     float antiSphereParam = -1;
     int SphereStatus = 2;
-    float SphereIntention = 50;
+    float SphereIntention = 0;
     float SphereColor[3] = {(float)204/ 255, (float)77/ 255, (float)5/ 255 };
 
     float BoxLen = 1;
     float BoxHei = 1;
     float BoxWi = 1;
-    int BoxCoord[3] = {};
-    //float BoxParam = 1;
-    //float antiBoxParam = -1;
-    //int BoxStatus = 2;
-    //float BoxIntention = 50;
+    float BoxCoord[3] = {};
+    float BoxParam = 1;
+    float antiBoxParam = -1;
+    int BoxStatus = 2;
+    float BoxIntention = 0;
     float BoxColor[3] = {(float)204/ 255, (float)77/ 255, (float)5/ 255 };
 
     float CylRadius = 1;
-    int CylX[2] = {};
-    int CylY[2] = {};
-    int CylZ[2] = {};
+    float CylX[2] = {};
+    float CylY[2] = {};
+    float CylZ[2] = {};
+    float CylParam = 1;
+    float antiCylParam = -1;
+    int CylStatus = 2;
+    float CylIntention = 0;
     float CylColor[3] = {(float)204/ 255, (float)77/ 255, (float)5/ 255 };
 
-    int NormCoord[3] = {};
+    float NormCoord[3] = {};
+    float PlaneParam = 1;
+    float antiPlaneParam = -1;
+    int PlaneStatus = 2;
+    float PlaneIntention = 0;
     float PlaneColor[3] = {(float)204/ 255, (float)77/ 255, (float)5/ 255 };
 
     float ConeUpRadius = 1;
     float ConeDownRadius = 2;
-    int ConeX[2] = {};
-    int ConeY[2] = {};
-    int ConeZ[2] = {};
+    float ConeX[2] = {};
+    float ConeY[2] = {};
+    float ConeZ[2] = {};
+    float ConeParam = 1;
+    float antiConeParam = -1;
+    int ConeStatus = 2;
+    float ConeIntention = 0;
     float ConeColor[3] = {(float)204/ 255, (float)77/ 255, (float)5/ 255 };
-
     
 
-
-    
+    bool theme_switcher = false;
 
     window.setActive(true);
-
 
     while( window.isOpen() ) { // main loop
 
@@ -387,48 +396,56 @@ int main() {
         float u_time = time.asSeconds();
 
         
-        ImGui::Begin("Settings Window");
+        ImGui::Begin("Settings Window", NULL, ImGuiWindowFlags_MenuBar);
 
         if (ImGui::BeginMenuBar())
         {
             if (ImGui::BeginMenu("Appearance"))
             {
-                ImGui::CollapsingHeader("Help");
-                ImGui::MenuItem("Switch Theme");
-                //switch to light theme
+                ImGui::MenuItem("Switch Theme"); //add
+                ImGui::MenuItem("Switch Font");
 
                 ImGui::EndMenu();
             }
             if(ImGui::BeginMenu("Data"))
             {
-                ImGui::MenuItem("FPS Show");
-                ImGui::MenuItem("Resolution Shpw");
+                ImGui::MenuItem("FPS Show"); //add
+                ImGui::MenuItem("Resolution Show");
                 
-                //FPS show on/off
 
                 ImGui::EndMenu();
             }
             if(ImGui::BeginMenu("Credits"))
             {
                 ImGui::MenuItem("AWESOMESLAYER");
-                //Type our names
+                //Type our names and other info
                 ImGui::EndMenu();
             }
+            ImGui::EndMenuBar();
         }
 
+        ImGui::Text("You can modify and add objects using this settings:");
+        
         if(ImGui::CollapsingHeader("Objects Settings"))
         {
             if(ImGui::CollapsingHeader("Spheres"))
             {
             
                 ImGui::InputInt("Number", &spheres_num, 0, DEFAULT_SIZE);
+                if(spheres_num > DEFAULT_SIZE)
+                    spheres_num = 0;
+                SphereRadius = spheres_pos[spheres_num].w;
                 ImGui::SliderFloat("Radius", &SphereRadius, 0, MAX_RADIUS);
-                ImGui::InputInt3("Coord", SphereCoord);
+                SphereCoord[0] = spheres_pos[spheres_num].x;
+                SphereCoord[1] = spheres_pos[spheres_num].y;
+                SphereCoord[2] = spheres_pos[spheres_num].z;
+                ImGui::InputFloat3("Coord", SphereCoord);
             
 
                 ImGui::RadioButton("Haze", &SphereStatus, 1); ImGui::SameLine(); 
                 ImGui::RadioButton("Light", &SphereStatus, 2); ImGui::SameLine();
                 ImGui::RadioButton("Reflection", &SphereStatus, 3);
+                SphereParam = spheres_col[spheres_num].w;
                 if(SphereStatus == 1)
                 {
                     ImGui::SliderFloat("Haze", &SphereParam, 0, 1);
@@ -441,68 +458,172 @@ int main() {
                 else if(SphereStatus == 2)
                 {
                     ImGui::SliderFloat("Intention", &SphereIntention, 0, 100);
-                }    
+                }   
+                SphereColor[0] = spheres_col[spheres_num].x;
+                SphereColor[1] = spheres_col[spheres_num].y;
+                SphereColor[2] = spheres_col[spheres_num].z; 
                 ImGui::ColorEdit3("Color", SphereColor);
+                ImGui::SeparatorText("Sun Light Slider:");
+                ImGui::SliderFloat("Light", &sun_brightness, 0, 1);
             
             }
-            if(ImGui::CollapsingHeader("Boxes"))
+            else if(ImGui::CollapsingHeader("Boxes"))
             {
                 ImGui::InputInt("Number", &boxes_num, 0, DEFAULT_SIZE);
+                if(boxes_num > DEFAULT_SIZE)
+                    boxes_num = 0;
+                BoxLen = boxes_size[boxes_num].x;
+                BoxHei = boxes_size[boxes_num].y;
+                BoxWi = boxes_size[boxes_num].z;
                 ImGui::SliderFloat("Size", &BoxLen, 0, MAX_RADIUS); 
                 ImGui::SliderFloat("Height", &BoxHei, 0, MAX_RADIUS); 
                 ImGui::SliderFloat("Width", &BoxWi, 0, MAX_RADIUS);
-                ImGui::InputInt3("Coord", BoxCoord);
+                BoxCoord[0] = boxes_pos[boxes_num].x;
+                BoxCoord[1] = boxes_pos[boxes_num].y;
+                BoxCoord[2] = boxes_pos[boxes_num].z;
+
+                ImGui::InputFloat3("Coord", BoxCoord);
         
-                //ImGui::RadioButton("Haze", &BoxStatus, 1); ImGui::SameLine();
-                //ImGui::RadioButton("Light", &BoxStatus, 2); ImGui::SameLine();
-                //ImGui::RadioButton("Reflection", &BoxStatus, 3);
-                // if(BoxStatus == 1)
-                // {
-                //     ImGui::SliderFloat("Haze", &BoxParam, 0, 1);
-                // }
-                // else if(BoxStatus == 3)
-                // {
-                //     ImGui::SliderFloat("Reflection", &antiBoxParam, 0, 1.99);
-                //     BoxParam = -antiBoxParam;
-                // }
-                // else if(BoxStatus == 2)
-                // {
-                //     ImGui::SliderFloat("Intention", &BoxIntention, 0, 100);
-                // }    
+                ImGui::RadioButton("Haze", &BoxStatus, 1); ImGui::SameLine();
+                ImGui::RadioButton("Light", &BoxStatus, 2); ImGui::SameLine();
+                ImGui::RadioButton("Reflection", &BoxStatus, 3);
+                BoxParam = boxes_col[boxes_num].w;
+                if(BoxStatus == 1)
+                {
+                    ImGui::SliderFloat("Haze", &BoxParam, 0, 1);
+                }
+                else if(BoxStatus == 3)
+                {
+                    ImGui::SliderFloat("Reflection", &antiBoxParam, 0, 1.99);
+                    BoxParam = -antiBoxParam;
+                }
+                else if(BoxStatus == 2)
+                {
+                    ImGui::SliderFloat("Intention", &BoxIntention, 0, 1);
+                }
+                BoxColor[0] = boxes_col[boxes_num].x;
+                BoxColor[1] = boxes_col[boxes_num].y;
+                BoxColor[2] = boxes_col[boxes_num].z;    
                 ImGui::ColorEdit3("Color", BoxColor);
             
             }
-            if(ImGui::CollapsingHeader("Cylindres"))
+            else if(ImGui::CollapsingHeader("Cylindres"))
             {
                 ImGui::InputInt("Number", &cyl_num, 0, DEFAULT_SIZE);
-                ImGui::SliderFloat("Radius", &CylRadius, 0, MAX_RADIUS); 
-                ImGui::InputInt2("Up and Down X", CylX);
-                ImGui::InputInt2("Up and Down Y", CylY);
-                ImGui::InputInt2("Up and Down Z", CylZ); 
+                if(cyl_num > DEFAULT_SIZE)
+                    cyl_num = 0;
+                CylRadius = cyl_up_point[cyl_num].w;
+                ImGui::SliderFloat("Radius", &CylRadius, 0, MAX_RADIUS);
+                CylX[0] = cyl_up_point[cyl_num].x;
+                CylX[1] = cyl_down_point[cyl_num].x;
+                CylY[0] = cyl_up_point[cyl_num].y;
+                CylY[1] = cyl_down_point[cyl_num].y;
+                CylZ[0] = cyl_up_point[cyl_num].z;
+                CylZ[1] = cyl_down_point[cyl_num].z;
+
+                ImGui::InputFloat2("Up and Down X", CylX);
+                ImGui::InputFloat2("Up and Down Y", CylY);
+                ImGui::InputFloat2("Up and Down Z", CylZ); 
                 
+                CylParam = cyl_col[cyl_num].w;
+                if(CylStatus == 1)
+                {
+                    ImGui::SliderFloat("Haze", &CylParam, 0, 1);
+                }
+                else if(CylStatus == 3)
+                {
+                    ImGui::SliderFloat("Reflection", &antiCylParam, 0, 1.99);
+                    CylParam = -antiCylParam;
+                }
+                else if(CylStatus == 2)
+                {
+                    ImGui::SliderFloat("Intention", &CylIntention, 0, 1);
+                }
+                
+                CylColor[0]=cyl_col[cyl_num].x;
+                CylColor[1]=cyl_col[cyl_num].y;
+                CylColor[2]=cyl_col[cyl_num].z;
                 ImGui::ColorEdit3("Color", CylColor);
             }
-            if(ImGui::CollapsingHeader("Planes"))
+            else if(ImGui::CollapsingHeader("Planes"))
             {
                 ImGui::InputInt("Number", &planes_num, 0, PLANES_SIZE);
-                ImGui::InputInt3("Norm Coord", NormCoord);
+                if(planes_num > PLANES_SIZE)
+                    planes_num = 0;
+                NormCoord[0] = planes_norm[planes_num].x;
+                NormCoord[1] = planes_norm[planes_num].y;
+                NormCoord[2] = planes_norm[planes_num].z;
+                ImGui::InputFloat3("Norm Coord", NormCoord);
+                
+                PlaneParam = planes_col[planes_num].w;
+                if(PlaneStatus == 1)
+                {
+                    ImGui::SliderFloat("Haze", &PlaneParam, 0, 1);
+                }
+                else if(PlaneStatus == 3)
+                {
+                    ImGui::SliderFloat("Reflection", &antiPlaneParam, 0, 1.99);
+                    PlaneParam = -antiPlaneParam;
+                }
+                else if(PlaneStatus == 2)
+                {
+                    ImGui::SliderFloat("Intention", &PlaneIntention, 0, 1);
+                }
+                
+                PlaneColor[0] = planes_col[planes_num].x;
+                PlaneColor[1] = planes_col[planes_num].y;
+                PlaneColor[2] = planes_col[planes_num].z;
                 ImGui::ColorEdit3("Color", PlaneColor);
             }
-            if(ImGui::CollapsingHeader("Cones"))
+            else if(ImGui::CollapsingHeader("Cones"))
             {
                 ImGui::InputInt("Number", &cones_num, 0, DEFAULT_SIZE); 
+                if(cones_num >DEFAULT_SIZE)
+                    cones_num = 0;
+                ConeUpRadius = cones_up_point[cones_num].w;
+                ConeDownRadius = cones_down_point[cones_num].w;
                 ImGui::SliderFloat("Up Radius", &ConeUpRadius, 0, MAX_RADIUS);
                 ImGui::SliderFloat("Down Radius", &ConeDownRadius, 0, MAX_RADIUS);
-                ImGui::InputInt2("Up and Down X", ConeX); 
-                ImGui::InputInt2("Up and Down Y", ConeY); 
-                ImGui::InputInt2("Up and Down Z", ConeZ);
+                
+                ConeX[0] = cones_up_point[cones_num].x;
+                ConeY[0] = cones_up_point[cones_num].y;
+                ConeZ[0] = cones_up_point[cones_num].z;
+                ConeX[1] = cones_down_point[cones_num].x;
+                ConeY[1] = cones_down_point[cones_num].y;
+                ConeZ[1] = cones_down_point[cones_num].z;
+                ImGui::InputFloat2("Up and Down X", ConeX); 
+                ImGui::InputFloat2("Up and Down Y", ConeY); 
+                ImGui::InputFloat2("Up and Down Z", ConeZ);
+                
+                ConeParam = cones_col[cones_num].w;
+                if(ConeStatus == 1)
+                {
+                    ImGui::SliderFloat("Haze", &ConeParam, 0, 1);
+                }
+                else if(ConeStatus == 3)
+                {
+                    ImGui::SliderFloat("Reflection", &antiConeParam, 0, 1.99);
+                    ConeParam = -antiConeParam;
+                }
+                else if(ConeStatus == 2)
+                {
+                    ImGui::SliderFloat("Intention", &ConeIntention, 0, 1);
+                }
+                
+                ConeColor[0] = cones_col[cones_num].x;
+                ConeColor[1] = cones_col[cones_num].y;
+                ConeColor[2] = cones_col[cones_num].z;
                 ImGui::ColorEdit3("Color", ConeColor);
             }
         }
+        ImGui::Separator();
+        ImGui::Text("For modifying graphic settings you can use:");
         if(ImGui::CollapsingHeader("Graphic Settings"))
         {
-            ImGui::SliderFloat("Smooth", &Smooth, 0, MAX_SMOOTH);
-            ImGui::InputInt("FPS", &FPS);
+            ImGui::SliderFloat("Smooth", &Smooth, 0, MAX_SMOOTH); //add
+            ImGui::InputInt("FPS", &FPS); //add 
+            //Resoluiton
+            // Vsync
         }
         ImGui::End();
 
