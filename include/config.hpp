@@ -23,10 +23,4 @@ enum Control_Keys {
 
 };
 
-<<<<<<< HEAD
-
-
 #endif
-=======
-#endif
->>>>>>> merge.test4

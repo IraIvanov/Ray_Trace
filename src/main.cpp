@@ -19,9 +19,9 @@
     ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoBackground | \
         ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | \
         ImGuiWindowFlags_NoMove
-#define ImGuiSettingsFlags                                   \
-    ImGuiWindowFlags_MenuBar | \
-        ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize
+#define ImGuiSettingsFlags                               \
+    ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoMove | \
+        ImGuiWindowFlags_NoResize
 
 int main() {
     // window and graphics settings
@@ -93,7 +93,7 @@ int main() {
     bool show_smooth = false;
     bool show_resolution = false;
     bool quit = false;
-    
+
     int style_idx = 0;
 
     // random settings
@@ -177,24 +177,6 @@ int main() {
         cyl_col[i] = sf::Glsl::Vec4(0.f, 0.f, 0.f, 0.f);
     }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-    cyl_down_point[0] = sf::Glsl::Vec3( 4.f, 8.f, 1.f );
-    cyl_up_point[0] = sf::Glsl::Vec4( 4.f, 8.f, -2.f, 0.5 );
-    cyl_col[0] = sf::Glsl::Vec4( 0.1, 0.6, 0.7, 1.f );
-
-
-
-
-    sf::Vector3f camera_position( 0.f, 0.f, 0.f );
-    sf::Vector3f camera_movement( 0.f, 0.f, 0.f );
-=======
-    cyl_down_point[0] = sf::Glsl::Vec3(4.f, 8.f, 1.f);
-    cyl_up_point[0] = sf::Glsl::Vec4(4.f, 8.f, -2.f, 0.5);
-    cyl_col[0] = sf::Glsl::Vec4(0.1, 0.6, 0.7, 1.f);
-
-=======
->>>>>>> merge.test3
     float SphereRadius = 1;
     float SphereCoord[3] = {};
     float SphereParam = 1;
@@ -238,10 +220,8 @@ int main() {
     float ConeIntention = 0;
     float ConeColor[3] = {(float)204 / 255, (float)77 / 255, (float)5 / 255};
 
-   
-
     sf::Clock fps_clock;
-    int frame_counter = 0;
+    int frame_counter = 0, fps_print = 0;
     sf::Time delta_time;
 
     ImGui::SFML::Init(window);
@@ -251,8 +231,6 @@ int main() {
     cyl_num = -1;
     boxes_num = -1;
     planes_num = 1;
-    
->>>>>>> merge.test4
 
     while (window.isOpen()) {  // main lopp
 
@@ -292,12 +270,9 @@ int main() {
 
                 case (sf::Event::KeyPressed):
 
-<<<<<<< HEAD
-=======
                     switch (event.key.code) {
                         case (sf::Keyboard::W):
 
->>>>>>> merge.test4
                             camera_movement.x = WALKING_PACE;
                             FrameStill = 1;
 
@@ -310,11 +285,8 @@ int main() {
 
                             break;
 
-<<<<<<< HEAD
-=======
                         case (sf::Keyboard::S):
 
->>>>>>> merge.test4
                             camera_movement.x = -WALKING_PACE;
                             FrameStill = 1;
 
@@ -388,15 +360,6 @@ int main() {
         float res_mouse_x = (float(mouse_x) / WIDTH - 0.5f) * MOUSE_SENSITIVITY;
         float res_mouse_y = (float(mouse_y) / HIGHT - 0.5f) * MOUSE_SENSITIVITY;
 
-<<<<<<< HEAD
-        float res_mouse_x =  (float(mouse_x) / WIDTH - 0.5f) * MOUSE_SENSITIVITY; 
-        float res_mouse_y =  (float(mouse_y) / HIGHT - 0.5f) * MOUSE_SENSITIVITY;
-        window.setActive();
-        shader.setUniform("u_mouse",  sf::Vector2f(res_mouse_x , res_mouse_y ) );
-
-        camera_position.x += cos( res_mouse_x ) * camera_movement.x - camera_movement.y * sin ( res_mouse_x );
-        camera_position.y += sin( res_mouse_x ) * camera_movement.x + camera_movement.y * cos ( res_mouse_x );
-=======
         window.setActive();
         shader.setUniform("u_mouse", sf::Vector2f(res_mouse_x, res_mouse_y));
 
@@ -404,7 +367,6 @@ int main() {
                              camera_movement.y * sin(res_mouse_x);
         camera_position.y += camera_movement.x * sin(res_mouse_x) +
                              camera_movement.y * cos(res_mouse_x);
->>>>>>> merge.test4
         camera_position.z += camera_movement.z;
 
         camera_movement.x = 0.f;
@@ -413,51 +375,18 @@ int main() {
 
         time = clock.getElapsedTime();
         float u_time = time.asSeconds();
-<<<<<<< HEAD
-        shader.setUniform("u_time",  u_time);                 
-        shader.setUniform("u_camera_pos", camera_position );
-        shader.setUniform("u_sample_part", 1.0f / FrameStill) ;
-        shader.setUniform("u_seed1", sf::Vector2f((float)dist(e2), (float)dist(e2)) * 999.0f);
-		shader.setUniform("u_seed2", sf::Vector2f((float)dist(e2), (float)dist(e2)) * 999.0f);
-        shader.setUniform("sun_brightness", sun_brightness );
-        shader.setUniformArray( "spheres_pos", spheres_pos, DEFAULT_SIZE );
-        shader.setUniformArray( "spheres_col", spheres_col, DEFAULT_SIZE );
-        shader.setUniformArray( "boxes_pos", boxes_pos, DEFAULT_SIZE );
-        shader.setUniformArray( "boxes_col", boxes_col, DEFAULT_SIZE );
-        shader.setUniformArray( "boxes_size", boxes_size, DEFAULT_SIZE );
-        shader.setUniformArray( "planes_norm", planes_norm, PLANES_SIZE );
-        shader.setUniformArray( "planes_col", planes_col, PLANES_SIZE );
-        shader.setUniformArray( "cones_down_point", cones_down_point, DEFAULT_SIZE );
-        shader.setUniformArray( "cones_up_point", cones_up_point, DEFAULT_SIZE );
-        shader.setUniformArray( "cones_col", cones_col, DEFAULT_SIZE );
-        shader.setUniformArray( "cyl_down_point", cyl_down_point, DEFAULT_SIZE );
-        shader.setUniformArray( "cyl_up_point", cyl_up_point, DEFAULT_SIZE );
-        shader.setUniformArray( "cyl_col", cyl_col, DEFAULT_SIZE );
-        shader.setUniform( "ulight_pos", ulight_pos );
 
-        if ( switcher == true ) {
-
-            if ( FrameStill % 2 == 1 ) {
-
-                shader.setUniform("u_sample", OutTexture.getTexture() );
-                FinalTexture.draw( OutSpriteFlipped, &shader );
-                window.draw( FinalSprite );
-=======
->>>>>>> merge.test4
-
-        if(switcherEscape)
-        {
+        if (switcherEscape) {
             ImGui::SetNextWindowSize(
                 ImVec2(598, 555));                  //, ImGuiCond_FirstUseEver);
             ImGui::SetNextWindowPos(ImVec2(0, 0));  //, ImGuiCond_FirstUseEver);
             ImGui::Begin("Settings Window", NULL, ImGuiSettingsFlags);
 
-            
             if (ImGui::BeginMenuBar()) {
                 if (ImGui::BeginMenu("Appearance")) {
                     if (ImGui::BeginMenu("Switch Theme")) {
                         ImGui::Combo("Theme", &style_idx,
-                                    "Dark\0Light\0Classic\0\0");
+                                     "Dark\0Light\0Classic\0\0");
                         switch (style_idx) {
                             case 0:
                                 ImGui::StyleColorsDark();
@@ -471,17 +400,16 @@ int main() {
                         }
                         ImGui::EndMenu();
                     }
-                    if(ImGui::BeginMenu("Switch Font"))
-                    {
+                    if (ImGui::BeginMenu("Switch Font")) {
                         ImGui::ShowFontSelector("Fonts##Selector");
-                        
+
                         ImGui::EndMenu();
                     }
 
                     ImGui::MenuItem("Quit", NULL, &quit);
-                    if(quit)
+                    if (quit)
                         window.close();
-                        
+
                     ImGui::EndMenu();
                 }
                 if (ImGui::BeginMenu("Data")) {
@@ -492,17 +420,17 @@ int main() {
                 if (ImGui::BeginMenu("Credits")) {
                     if (ImGui::BeginMenu("AWES0MESLAYER")) {
                         ImGui::TextColored(ImVec4(1.0f, 0.0f, 1.0f, 1.0f),
-                                        "MOST HATED");
+                                           "MOST HATED");
                         ImGui::EndMenu();
                     }
                     if (ImGui::BeginMenu("OLE G")) {
                         ImGui::TextColored(ImVec4(0.7f, 0.5f, 1.0f, 0.8f),
-                                        "EGG FRYER");
+                                           "EGG FRYER");
                         ImGui::EndMenu();
                     }
                     if (ImGui::BeginMenu("IraIvanov")) {
                         ImGui::TextColored(ImVec4(0.9f, 0.35f, 0.34f, 0.99f),
-                                        "$ad boy");
+                                           "$ad boy");
                         ImGui::EndMenu();
                     }
                     ImGui::EndMenu();
@@ -517,11 +445,11 @@ int main() {
 
             if (ImGui::CollapsingHeader("Objects Settings")) {
                 if (ImGui::TreeNode("Spheres")) {
-                    if (spheres_num > DEFAULT_SIZE)
-                        spheres_num = -1;
+                    if (spheres_num > DEFAULT_SIZE || spheres_num < 0)
+                        spheres_num = 0;
                     ImGui::InputInt("Number", &spheres_num);
-                    if (spheres_num > DEFAULT_SIZE)
-                        spheres_num = -1;
+                    if (spheres_num > DEFAULT_SIZE || spheres_num < 0)
+                        spheres_num = 0;
                     SphereRadius = spheres_pos[spheres_num].w;
                     ImGui::SliderFloat("Radius", &SphereRadius, 0, MAX_RADIUS);
                     SphereCoord[0] = spheres_pos[spheres_num].x;
@@ -538,11 +466,13 @@ int main() {
                     if (SphereStatus == 1) {
                         ImGui::SliderFloat("Haze", &SphereParam, 0, 1);
                     } else if (SphereStatus == 3) {
-                        ImGui::SliderFloat("Reflection", &antiSphereParam, 0, 1.99);
+                        ImGui::SliderFloat("Reflection", &antiSphereParam, 0,
+                                           1.99);
                         SphereParam = -antiSphereParam;
                     } else if (SphereStatus == 2) {
                         SphereParam = -2;
-                        ImGui::SliderFloat("Intention", &SphereIntention, 0, 100);
+                        ImGui::SliderFloat("Intention", &SphereIntention, 0,
+                                           100);
                     }
                     SphereColor[0] = spheres_col[spheres_num].x;
                     SphereColor[1] = spheres_col[spheres_num].y;
@@ -553,15 +483,16 @@ int main() {
                     ImGui::TreePop();
                 }
                 if (ImGui::TreeNode("Boxes")) {
-                    if (boxes_num > DEFAULT_SIZE)
-                        boxes_num = -1;
+                    if (boxes_num > DEFAULT_SIZE || boxes_num < 0)
+                        boxes_num = 0;
                     ImGui::InputInt("Number", &boxes_num);
-                    if (boxes_num > DEFAULT_SIZE)
-                        boxes_num = -1;
+                    if (boxes_num > DEFAULT_SIZE || boxes_num < 0)
+                        boxes_num = 0;
                     BoxSize[0] = boxes_size[boxes_num].x;
                     BoxSize[1] = boxes_size[boxes_num].y;
                     BoxSize[2] = boxes_size[boxes_num].z;
-                    ImGui::SliderFloat3("Len Height Width", BoxSize, 0, MAX_RADIUS);
+                    ImGui::SliderFloat3("Len Height Width", BoxSize, 0,
+                                        MAX_RADIUS);
                     BoxCoord[0] = boxes_pos[boxes_num].x;
                     BoxCoord[1] = boxes_pos[boxes_num].y;
                     BoxCoord[2] = boxes_pos[boxes_num].z;
@@ -577,7 +508,8 @@ int main() {
                     if (BoxStatus == 1) {
                         ImGui::SliderFloat("Haze", &BoxParam, 0, 1);
                     } else if (BoxStatus == 3) {
-                        ImGui::SliderFloat("Reflection", &antiBoxParam, 0, 1.99);
+                        ImGui::SliderFloat("Reflection", &antiBoxParam, 0,
+                                           1.99);
                         BoxParam = -antiBoxParam;
                     } else if (BoxStatus == 2) {
                         BoxParam = -2;
@@ -590,11 +522,11 @@ int main() {
                     ImGui::TreePop();
                 }
                 if (ImGui::TreeNode("Cylindres")) {
-                    if (cyl_num > DEFAULT_SIZE)
-                        cyl_num = -1;
+                    if (cyl_num > DEFAULT_SIZE || cyl_num < 0)
+                        cyl_num = 0;
                     ImGui::InputInt("Number", &cyl_num);
-                    if (cyl_num > DEFAULT_SIZE)
-                        cyl_num = -1;
+                    if (cyl_num > DEFAULT_SIZE || cyl_num < 0)
+                        cyl_num = 0;
                     CylRadius = cyl_up_point[cyl_num].w;
                     ImGui::SliderFloat("Radius", &CylRadius, 0, MAX_RADIUS);
                     CylX[0] = cyl_up_point[cyl_num].x;
@@ -608,7 +540,6 @@ int main() {
                     ImGui::InputFloat2("Up and Down Y", CylY);
                     ImGui::InputFloat2("Up and Down Z", CylZ);
 
-
                     ImGui::RadioButton("Haze", &CylStatus, 1);
                     ImGui::SameLine();
                     ImGui::RadioButton("Light", &CylStatus, 2);
@@ -619,7 +550,8 @@ int main() {
                     if (CylStatus == 1) {
                         ImGui::SliderFloat("Haze", &CylParam, 0, 1);
                     } else if (CylStatus == 3) {
-                        ImGui::SliderFloat("Reflection", &antiCylParam, 0, 1.99);
+                        ImGui::SliderFloat("Reflection", &antiCylParam, 0,
+                                           1.99);
                         CylParam = -antiCylParam;
                     } else if (CylStatus == 2) {
                         BoxParam = -2;
@@ -634,16 +566,15 @@ int main() {
                     ImGui::TreePop();
                 }
                 if (ImGui::TreeNode("Planes")) {
-                    if (planes_num > PLANES_SIZE)
-                        planes_num = -1;
+                    if (planes_num > PLANES_SIZE || planes_num < 0)
+                        planes_num = 0;
                     ImGui::InputInt("Number", &planes_num);
-                    if (planes_num > PLANES_SIZE)
-                        planes_num = -1;
+                    if (planes_num > PLANES_SIZE || planes_num < 0)
+                        planes_num = 0;
                     NormCoord[0] = planes_norm[planes_num].x;
                     NormCoord[1] = planes_norm[planes_num].y;
                     NormCoord[2] = planes_norm[planes_num].z;
                     ImGui::InputFloat3("Norm Coord", NormCoord);
-
 
                     ImGui::RadioButton("Haze", &PlaneStatus, 1);
                     ImGui::SameLine();
@@ -655,7 +586,8 @@ int main() {
                     if (PlaneStatus == 1) {
                         ImGui::SliderFloat("Haze", &PlaneParam, 0, 1);
                     } else if (PlaneStatus == 3) {
-                        ImGui::SliderFloat("Reflection", &antiPlaneParam, 0, 1.99);
+                        ImGui::SliderFloat("Reflection", &antiPlaneParam, 0,
+                                           1.99);
                         PlaneParam = -antiPlaneParam;
                     } else if (PlaneStatus == 2) {
                         BoxParam = -2;
@@ -670,14 +602,15 @@ int main() {
                     ImGui::TreePop();
                 }
                 if (ImGui::TreeNode("Cones")) {
-                    if (cones_num > DEFAULT_SIZE)
-                        cones_num = -1;
+                    if (cones_num > DEFAULT_SIZE || cones_num < 0)
+                        cones_num = 0;
                     ImGui::InputInt("Number", &cones_num);
-                    if (cones_num > DEFAULT_SIZE)
-                        cones_num = -1;
+                    if (cones_num > DEFAULT_SIZE || cones_num < 0)
+                        cones_num = 0;
                     ConeRadius[0] = cones_up_point[cones_num].w;
                     ConeRadius[1] = cones_down_point[cones_num].w;
-                    ImGui::SliderFloat2("Up and down Radius", ConeRadius, 0, MAX_RADIUS);
+                    ImGui::SliderFloat2("Up and down Radius", ConeRadius, 0,
+                                        MAX_RADIUS);
 
                     ConeX[0] = cones_up_point[cones_num].x;
                     ConeY[0] = cones_up_point[cones_num].y;
@@ -689,7 +622,6 @@ int main() {
                     ImGui::InputFloat2("Up and Down Y", ConeY);
                     ImGui::InputFloat2("Up and Down Z", ConeZ);
 
-
                     ImGui::RadioButton("Haze", &ConeStatus, 1);
                     ImGui::SameLine();
                     ImGui::RadioButton("Light", &ConeStatus, 2);
@@ -700,7 +632,8 @@ int main() {
                     if (ConeStatus == 1) {
                         ImGui::SliderFloat("Haze", &ConeParam, 0, 1);
                     } else if (ConeStatus == 3) {
-                        ImGui::SliderFloat("Reflection", &antiConeParam, 0, 1.99);
+                        ImGui::SliderFloat("Reflection", &antiConeParam, 0,
+                                           1.99);
                         ConeParam = -antiConeParam;
                     } else if (ConeStatus == 2) {
                         ConeParam = -2;
@@ -727,7 +660,6 @@ int main() {
                 ImGui::Checkbox("VSYNC", &switcherVsync);
             }
             ImGui::End();
-            
 
             if (show_fps) {
                 ImGui::SetNextWindowSize(
@@ -735,7 +667,7 @@ int main() {
                 ImGui::SetNextWindowPos(
                     ImVec2(1840, 5));  //, ImGuiCond_FirstUseEver);
                 ImGui::Begin("FPS", NULL, ImGuiFPSFlags);
-                ImGui::Text("FPS: %d", frame_counter); //edit to frame_print
+                ImGui::Text("FPS: %d", fps_print);  // edit to frame_print
                 ImGui::End();
             }
             if (show_resolution) {
@@ -799,12 +731,12 @@ int main() {
             cones_col[cones_num].z = ConeColor[2];
             cones_col[cones_num].w = ConeParam;
 
-            
             window.setVerticalSyncEnabled(switcherVsync);
 
-            //window.setSize(sf::Vector2u(Resolution[0], Resolution[1])); set size with params
-            //settings.antialiasingLevel = Smooth;
-            //window.setamtianilacing ???? do it b urself -> AA level in Smooth int!
+            // window.setSize(sf::Vector2u(Resolution[0], Resolution[1])); set
+            // size with params settings.antialiasingLevel = Smooth;
+            // window.setamtianilacing ???? do it b urself -> AA level in Smooth
+            // int!
         }
 
         shader.setUniform("u_time", u_time);
@@ -858,8 +790,7 @@ int main() {
         delta_time += fps_clock.restart();
         frame_counter++;
         if (delta_time.asSeconds() >= 1.f) {
-            std::cout << "FPS: " << frame_counter << std::endl;
-
+            fps_print = frame_counter;
             frame_counter = 0;
             delta_time = sf::seconds(0.f);
         }
