@@ -13,14 +13,14 @@
 
 #define MAX_RADIUS 10
 #define MAX_COORD 100
-#define MAX_SMOOTH 100
+#define MAX_AA 32
 
 #define ImGuiFPSFlags                                             \
     ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoBackground | \
         ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | \
         ImGuiWindowFlags_NoMove
 #define ImGuiSettingsFlags                                   \
-    ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoCollapse | \
+    ImGuiWindowFlags_MenuBar | \
         ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize
 
 int main() {
@@ -32,6 +32,9 @@ int main() {
     window.setFramerateLimit(MAX_FPS);
     window.setVerticalSyncEnabled(false);
     glEnable(GL_MULTISAMPLE_ARB);
+
+    sf::ContextSettings settings;
+    settings.antialiasingLevel = 8;
 
     // shader settings
 
@@ -78,20 +81,20 @@ int main() {
 
     bool switcherLcontrol = true;
     bool switcherEscape = false;
-    bool switcherVsync;
+    bool switcherVsync = false;
 
-    float Smooth = 0;
+    int Smooth = 0;
     int CurrentFPS = 0;
     int FPS = 120;
     int Resolution[2] = {1920, 1080};
 
     bool show_fps = false;
-
+    bool theme_switcher = false;
     bool show_smooth = false;
     bool show_resolution = false;
-    bool Vsync = false;
+    bool quit = false;
+    
     int style_idx = 0;
-    bool change_font = false;
 
     // random settings
 
@@ -253,7 +256,7 @@ int main() {
     float ConeIntention = 0;
     float ConeColor[3] = {(float)204 / 255, (float)77 / 255, (float)5 / 255};
 
-    bool theme_switcher = false;
+   
 
     sf::Clock fps_clock;
     int frame_counter = 0;
@@ -405,323 +408,344 @@ int main() {
         time = clock.getElapsedTime();
         float u_time = time.asSeconds();
 
-        ImGui::SetNextWindowSize(
-            ImVec2(598, 555));                  //, ImGuiCond_FirstUseEver);
-        ImGui::SetNextWindowPos(ImVec2(0, 0));  //, ImGuiCond_FirstUseEver);
-        ImGui::Begin("Settings Window", NULL, ImGuiSettingsFlags);
+        if(switcherEscape)
+        {
+            ImGui::SetNextWindowSize(
+                ImVec2(598, 555));                  //, ImGuiCond_FirstUseEver);
+            ImGui::SetNextWindowPos(ImVec2(0, 0));  //, ImGuiCond_FirstUseEver);
+            ImGui::Begin("Settings Window", NULL, ImGuiSettingsFlags);
 
-        if (ImGui::BeginMenuBar()) {
-            if (ImGui::BeginMenu("Appearance")) {
-                if (ImGui::BeginMenu("Switch Theme")) {
-                    ImGui::Combo("Theme", &style_idx,
-                                 "Dark\0Light\0Classic\0\0");
-                    switch (style_idx) {
-                        case 0:
-                            ImGui::StyleColorsDark();
-                            break;
-                        case 1:
-                            ImGui::StyleColorsLight();
-                            break;
-                        case 2:
-                            ImGui::StyleColorsClassic();
-                            break;
+            
+            if (ImGui::BeginMenuBar()) {
+                if (ImGui::BeginMenu("Appearance")) {
+                    if (ImGui::BeginMenu("Switch Theme")) {
+                        ImGui::Combo("Theme", &style_idx,
+                                    "Dark\0Light\0Classic\0\0");
+                        switch (style_idx) {
+                            case 0:
+                                ImGui::StyleColorsDark();
+                                break;
+                            case 1:
+                                ImGui::StyleColorsLight();
+                                break;
+                            case 2:
+                                ImGui::StyleColorsClassic();
+                                break;
+                        }
+                        ImGui::EndMenu();
+                    }
+                    if(ImGui::BeginMenu("Switch Font"))
+                    {
+                        ImGui::ShowFontSelector("Fonts##Selector");
+                        ImGui::EndMenu();
+                    }
+
+                    ImGui::MenuItem("Quit", NULL, &quit);
+                    if(quit)
+                        window.close();
+                        
+                    ImGui::EndMenu();
+                }
+                if (ImGui::BeginMenu("Data")) {
+                    ImGui::MenuItem("FPS Show", NULL, &show_fps);
+                    ImGui::MenuItem("Resolution Show", NULL, &show_resolution);
+                    ImGui::EndMenu();
+                }
+                if (ImGui::BeginMenu("Credits")) {
+                    if (ImGui::BeginMenu("AWES0MESLAYER")) {
+                        ImGui::TextColored(ImVec4(1.0f, 0.0f, 1.0f, 1.0f),
+                                        "MOST HATED");
+                        ImGui::EndMenu();
+                    }
+                    if (ImGui::BeginMenu("OLE G")) {
+                        ImGui::TextColored(ImVec4(0.7f, 0.5f, 1.0f, 0.8f),
+                                        "EGG FRYER");
+                        ImGui::EndMenu();
+                    }
+                    if (ImGui::BeginMenu("IraIvanov")) {
+                        ImGui::TextColored(ImVec4(0.9f, 0.35f, 0.34f, 0.99f),
+                                        "$ad boy");
+                        ImGui::EndMenu();
                     }
                     ImGui::EndMenu();
                 }
-                ImGui::MenuItem("Switch Font", NULL, &change_font);
-
-                ImGui::EndMenu();
+                ImGui::EndMenuBar();
             }
-            if (ImGui::BeginMenu("Data")) {
-                ImGui::MenuItem("FPS Show", NULL, &show_fps);
-                ImGui::MenuItem("Resolution Show", NULL, &show_resolution);
-                ImGui::EndMenu();
+            ImGui::TextColored(
+                ImVec4(1.0f, 0.0f, 0.0f, 1.0f),
+                "Welcome to the Settings of Ray_Tracing Project v2.28!");
+            ImGui::Separator();
+            ImGui::Text("You can modify and add objects using this settings:");
+
+            if (ImGui::CollapsingHeader("Objects Settings")) {
+                if (ImGui::TreeNode("Spheres")) {
+                    if (spheres_num > DEFAULT_SIZE)
+                        spheres_num = 0;
+                    ImGui::InputInt("Number", &spheres_num);
+                    if (spheres_num > DEFAULT_SIZE)
+                        spheres_num = 0;
+                    SphereRadius = spheres_pos[spheres_num].w;
+                    ImGui::SliderFloat("Radius", &SphereRadius, 0, MAX_RADIUS);
+                    SphereCoord[0] = spheres_pos[spheres_num].x;
+                    SphereCoord[1] = spheres_pos[spheres_num].y;
+                    SphereCoord[2] = spheres_pos[spheres_num].z;
+                    ImGui::InputFloat3("Coord", SphereCoord);
+
+                    ImGui::RadioButton("Haze", &SphereStatus, 1);
+                    ImGui::SameLine();
+                    ImGui::RadioButton("Light", &SphereStatus, 2);
+                    ImGui::SameLine();
+                    ImGui::RadioButton("Reflection", &SphereStatus, 3);
+                    SphereParam = spheres_col[spheres_num].w;
+                    if (SphereStatus == 1) {
+                        ImGui::SliderFloat("Haze", &SphereParam, 0, 1);
+                    } else if (SphereStatus == 3) {
+                        ImGui::SliderFloat("Reflection", &antiSphereParam, 0, 1.99);
+                        SphereParam = -antiSphereParam;
+                    } else if (SphereStatus == 2) {
+                        ImGui::SliderFloat("Intention", &SphereIntention, 0, 100);
+                    }
+                    SphereColor[0] = spheres_col[spheres_num].x;
+                    SphereColor[1] = spheres_col[spheres_num].y;
+                    SphereColor[2] = spheres_col[spheres_num].z;
+                    ImGui::ColorEdit3("Color", SphereColor);
+                    ImGui::SeparatorText("Sun Light Slider:");
+                    ImGui::SliderFloat("Light", &sun_brightness, 0, 1);
+                    ImGui::TreePop();
+                }
+                if (ImGui::TreeNode("Boxes")) {
+                    if (boxes_num > DEFAULT_SIZE)
+                        boxes_num = 0;
+                    ImGui::InputInt("Number", &boxes_num);
+                    if (boxes_num > DEFAULT_SIZE)
+                        boxes_num = 0;
+                    BoxLen = boxes_size[boxes_num].x;
+                    BoxHei = boxes_size[boxes_num].y;
+                    BoxWi = boxes_size[boxes_num].z;
+                    ImGui::SliderFloat("Size", &BoxLen, 0, MAX_RADIUS);
+                    ImGui::SliderFloat("Height", &BoxHei, 0, MAX_RADIUS);
+                    ImGui::SliderFloat("Width", &BoxWi, 0, MAX_RADIUS);
+                    BoxCoord[0] = boxes_pos[boxes_num].x;
+                    BoxCoord[1] = boxes_pos[boxes_num].y;
+                    BoxCoord[2] = boxes_pos[boxes_num].z;
+
+                    ImGui::InputFloat3("Coord", BoxCoord);
+
+                    ImGui::RadioButton("Haze", &BoxStatus, 1);
+                    ImGui::SameLine();
+                    ImGui::RadioButton("Light", &BoxStatus, 2);
+                    ImGui::SameLine();
+                    ImGui::RadioButton("Reflection", &BoxStatus, 3);
+                    BoxParam = boxes_col[boxes_num].w;
+                    if (BoxStatus == 1) {
+                        ImGui::SliderFloat("Haze", &BoxParam, 0, 1);
+                    } else if (BoxStatus == 3) {
+                        ImGui::SliderFloat("Reflection", &antiBoxParam, 0, 1.99);
+                        BoxParam = -antiBoxParam;
+                    } else if (BoxStatus == 2) {
+                        ImGui::SliderFloat("Intention", &BoxIntention, 0, 1);
+                    }
+                    BoxColor[0] = boxes_col[boxes_num].x;
+                    BoxColor[1] = boxes_col[boxes_num].y;
+                    BoxColor[2] = boxes_col[boxes_num].z;
+                    ImGui::ColorEdit3("Color", BoxColor);
+                    ImGui::TreePop();
+                }
+                if (ImGui::TreeNode("Cylindres")) {
+                    if (cyl_num > DEFAULT_SIZE)
+                        cyl_num = 0;
+                    ImGui::InputInt("Number", &cyl_num);
+                    if (cyl_num > DEFAULT_SIZE)
+                        cyl_num = 0;
+                    CylRadius = cyl_up_point[cyl_num].w;
+                    ImGui::SliderFloat("Radius", &CylRadius, 0, MAX_RADIUS);
+                    CylX[0] = cyl_up_point[cyl_num].x;
+                    CylX[1] = cyl_down_point[cyl_num].x;
+                    CylY[0] = cyl_up_point[cyl_num].y;
+                    CylY[1] = cyl_down_point[cyl_num].y;
+                    CylZ[0] = cyl_up_point[cyl_num].z;
+                    CylZ[1] = cyl_down_point[cyl_num].z;
+
+                    ImGui::InputFloat2("Up and Down X", CylX);
+                    ImGui::InputFloat2("Up and Down Y", CylY);
+                    ImGui::InputFloat2("Up and Down Z", CylZ);
+
+                    CylParam = cyl_col[cyl_num].w;
+                    if (CylStatus == 1) {
+                        ImGui::SliderFloat("Haze", &CylParam, 0, 1);
+                    } else if (CylStatus == 3) {
+                        ImGui::SliderFloat("Reflection", &antiCylParam, 0, 1.99);
+                        CylParam = -antiCylParam;
+                    } else if (CylStatus == 2) {
+                        ImGui::SliderFloat("Intention", &CylIntention, 0, 1);
+                    }
+
+                    CylColor[0] = cyl_col[cyl_num].x;
+                    CylColor[1] = cyl_col[cyl_num].y;
+                    CylColor[2] = cyl_col[cyl_num].z;
+                    ImGui::ColorEdit3("Color", CylColor);
+
+                    ImGui::TreePop();
+                }
+                if (ImGui::TreeNode("Planes")) {
+                    if (planes_num > PLANES_SIZE)
+                        planes_num = 0;
+                    ImGui::InputInt("Number", &planes_num);
+                    if (planes_num > PLANES_SIZE)
+                        planes_num = 0;
+                    NormCoord[0] = planes_norm[planes_num].x;
+                    NormCoord[1] = planes_norm[planes_num].y;
+                    NormCoord[2] = planes_norm[planes_num].z;
+                    ImGui::InputFloat3("Norm Coord", NormCoord);
+
+                    PlaneParam = planes_col[planes_num].w;
+                    if (PlaneStatus == 1) {
+                        ImGui::SliderFloat("Haze", &PlaneParam, 0, 1);
+                    } else if (PlaneStatus == 3) {
+                        ImGui::SliderFloat("Reflection", &antiPlaneParam, 0, 1.99);
+                        PlaneParam = -antiPlaneParam;
+                    } else if (PlaneStatus == 2) {
+                        ImGui::SliderFloat("Intention", &PlaneIntention, 0, 1);
+                    }
+
+                    PlaneColor[0] = planes_col[planes_num].x;
+                    PlaneColor[1] = planes_col[planes_num].y;
+                    PlaneColor[2] = planes_col[planes_num].z;
+                    ImGui::ColorEdit3("Color", PlaneColor);
+
+                    ImGui::TreePop();
+                }
+                if (ImGui::TreeNode("Cones")) {
+                    if (cones_num > DEFAULT_SIZE)
+                        cones_num = 0;
+                    ImGui::InputInt("Number", &cones_num);
+                    if (cones_num > DEFAULT_SIZE)
+                        cones_num = 0;
+                    ConeUpRadius = cones_up_point[cones_num].w;
+                    ConeDownRadius = cones_down_point[cones_num].w;
+                    ImGui::SliderFloat("Up Radius", &ConeUpRadius, 0, MAX_RADIUS);
+                    ImGui::SliderFloat("Down Radius", &ConeDownRadius, 0,
+                                    MAX_RADIUS);
+
+                    ConeX[0] = cones_up_point[cones_num].x;
+                    ConeY[0] = cones_up_point[cones_num].y;
+                    ConeZ[0] = cones_up_point[cones_num].z;
+                    ConeX[1] = cones_down_point[cones_num].x;
+                    ConeY[1] = cones_down_point[cones_num].y;
+                    ConeZ[1] = cones_down_point[cones_num].z;
+                    ImGui::InputFloat2("Up and Down X", ConeX);
+                    ImGui::InputFloat2("Up and Down Y", ConeY);
+                    ImGui::InputFloat2("Up and Down Z", ConeZ);
+
+                    ConeParam = cones_col[cones_num].w;
+                    if (ConeStatus == 1) {
+                        ImGui::SliderFloat("Haze", &ConeParam, 0, 1);
+                    } else if (ConeStatus == 3) {
+                        ImGui::SliderFloat("Reflection", &antiConeParam, 0, 1.99);
+                        ConeParam = -antiConeParam;
+                    } else if (ConeStatus == 2) {
+                        ImGui::SliderFloat("Intention", &ConeIntention, 0, 1);
+                    }
+
+                    ConeColor[0] = cones_col[cones_num].x;
+                    ConeColor[1] = cones_col[cones_num].y;
+                    ConeColor[2] = cones_col[cones_num].z;
+                    ImGui::ColorEdit3("Color", ConeColor);
+                    ImGui::TreePop();
+                }
             }
-            if (ImGui::BeginMenu("Credits")) {
-                if (ImGui::BeginMenu("AWES0MESLAYER")) {
-                    ImGui::TextColored(ImVec4(1.0f, 0.0f, 1.0f, 1.0f),
-                                       "MOST HATED");
-                    ImGui::EndMenu();
-                }
-                if (ImGui::BeginMenu("OLE G")) {
-                    ImGui::TextColored(ImVec4(0.7f, 0.5f, 1.0f, 0.8f),
-                                       "EGG FRYER");
-                    ImGui::EndMenu();
-                }
-                if (ImGui::BeginMenu("IraIvanov")) {
-                    ImGui::TextColored(ImVec4(0.9f, 0.35f, 0.34f, 0.99f),
-                                       "$ad boy");
-                    ImGui::EndMenu();
-                }
-                ImGui::EndMenu();
+            ImGui::Separator();
+            ImGui::Text("For modifying graphic settings you can use:");
+            if (ImGui::CollapsingHeader("Graphic Settings")) {
+                ImGui::SliderInt("AntiAliasing", &Smooth, 0, MAX_AA);  // add
+                if (FPS < 0)
+                    FPS = 10;
+                ImGui::InputInt("MaxFPS", &FPS, 10, 0);
+                ImGui::InputInt2("Resolution W X H", Resolution);
+                Resolution[0] = fabs(Resolution[0]);
+                Resolution[1] = fabs(Resolution[1]);
+                ImGui::Checkbox("VSYNC", &switcherVsync);
             }
-            ImGui::EndMenuBar();
-        }
-        ImGui::TextColored(
-            ImVec4(1.0f, 0.0f, 0.0f, 1.0f),
-            "Welcome to the Settings of Ray_Tracing Project v2.28!");
-        ImGui::Separator();
-        ImGui::Text("You can modify and add objects using this settings:");
-
-        if (ImGui::CollapsingHeader("Objects Settings")) {
-            if (ImGui::TreeNode("Spheres")) {
-                if (spheres_num > DEFAULT_SIZE)
-                    spheres_num = 0;
-                ImGui::InputInt("Number", &spheres_num);
-                if (spheres_num > DEFAULT_SIZE)
-                    spheres_num = 0;
-                SphereRadius = spheres_pos[spheres_num].w;
-                ImGui::SliderFloat("Radius", &SphereRadius, 0, MAX_RADIUS);
-                SphereCoord[0] = spheres_pos[spheres_num].x;
-                SphereCoord[1] = spheres_pos[spheres_num].y;
-                SphereCoord[2] = spheres_pos[spheres_num].z;
-                ImGui::InputFloat3("Coord", SphereCoord);
-
-                ImGui::RadioButton("Haze", &SphereStatus, 1);
-                ImGui::SameLine();
-                ImGui::RadioButton("Light", &SphereStatus, 2);
-                ImGui::SameLine();
-                ImGui::RadioButton("Reflection", &SphereStatus, 3);
-                SphereParam = spheres_col[spheres_num].w;
-                if (SphereStatus == 1) {
-                    ImGui::SliderFloat("Haze", &SphereParam, 0, 1);
-                } else if (SphereStatus == 3) {
-                    ImGui::SliderFloat("Reflection", &antiSphereParam, 0, 1.99);
-                    SphereParam = -antiSphereParam;
-                } else if (SphereStatus == 2) {
-                    ImGui::SliderFloat("Intention", &SphereIntention, 0, 100);
-                }
-                SphereColor[0] = spheres_col[spheres_num].x;
-                SphereColor[1] = spheres_col[spheres_num].y;
-                SphereColor[2] = spheres_col[spheres_num].z;
-                ImGui::ColorEdit3("Color", SphereColor);
-                ImGui::SeparatorText("Sun Light Slider:");
-                ImGui::SliderFloat("Light", &sun_brightness, 0, 1);
-                ImGui::TreePop();
-            }
-            if (ImGui::TreeNode("Boxes")) {
-                if (boxes_num > DEFAULT_SIZE)
-                    boxes_num = 0;
-                ImGui::InputInt("Number", &boxes_num);
-                if (boxes_num > DEFAULT_SIZE)
-                    boxes_num = 0;
-                BoxLen = boxes_size[boxes_num].x;
-                BoxHei = boxes_size[boxes_num].y;
-                BoxWi = boxes_size[boxes_num].z;
-                ImGui::SliderFloat("Size", &BoxLen, 0, MAX_RADIUS);
-                ImGui::SliderFloat("Height", &BoxHei, 0, MAX_RADIUS);
-                ImGui::SliderFloat("Width", &BoxWi, 0, MAX_RADIUS);
-                BoxCoord[0] = boxes_pos[boxes_num].x;
-                BoxCoord[1] = boxes_pos[boxes_num].y;
-                BoxCoord[2] = boxes_pos[boxes_num].z;
-
-                ImGui::InputFloat3("Coord", BoxCoord);
-
-                ImGui::RadioButton("Haze", &BoxStatus, 1);
-                ImGui::SameLine();
-                ImGui::RadioButton("Light", &BoxStatus, 2);
-                ImGui::SameLine();
-                ImGui::RadioButton("Reflection", &BoxStatus, 3);
-                BoxParam = boxes_col[boxes_num].w;
-                if (BoxStatus == 1) {
-                    ImGui::SliderFloat("Haze", &BoxParam, 0, 1);
-                } else if (BoxStatus == 3) {
-                    ImGui::SliderFloat("Reflection", &antiBoxParam, 0, 1.99);
-                    BoxParam = -antiBoxParam;
-                } else if (BoxStatus == 2) {
-                    ImGui::SliderFloat("Intention", &BoxIntention, 0, 1);
-                }
-                BoxColor[0] = boxes_col[boxes_num].x;
-                BoxColor[1] = boxes_col[boxes_num].y;
-                BoxColor[2] = boxes_col[boxes_num].z;
-                ImGui::ColorEdit3("Color", BoxColor);
-                ImGui::TreePop();
-            }
-            if (ImGui::TreeNode("Cylindres")) {
-                if (cyl_num > DEFAULT_SIZE)
-                    cyl_num = 0;
-                ImGui::InputInt("Number", &cyl_num);
-                if (cyl_num > DEFAULT_SIZE)
-                    cyl_num = 0;
-                CylRadius = cyl_up_point[cyl_num].w;
-                ImGui::SliderFloat("Radius", &CylRadius, 0, MAX_RADIUS);
-                CylX[0] = cyl_up_point[cyl_num].x;
-                CylX[1] = cyl_down_point[cyl_num].x;
-                CylY[0] = cyl_up_point[cyl_num].y;
-                CylY[1] = cyl_down_point[cyl_num].y;
-                CylZ[0] = cyl_up_point[cyl_num].z;
-                CylZ[1] = cyl_down_point[cyl_num].z;
-
-                ImGui::InputFloat2("Up and Down X", CylX);
-                ImGui::InputFloat2("Up and Down Y", CylY);
-                ImGui::InputFloat2("Up and Down Z", CylZ);
-
-                CylParam = cyl_col[cyl_num].w;
-                if (CylStatus == 1) {
-                    ImGui::SliderFloat("Haze", &CylParam, 0, 1);
-                } else if (CylStatus == 3) {
-                    ImGui::SliderFloat("Reflection", &antiCylParam, 0, 1.99);
-                    CylParam = -antiCylParam;
-                } else if (CylStatus == 2) {
-                    ImGui::SliderFloat("Intention", &CylIntention, 0, 1);
-                }
-
-                CylColor[0] = cyl_col[cyl_num].x;
-                CylColor[1] = cyl_col[cyl_num].y;
-                CylColor[2] = cyl_col[cyl_num].z;
-                ImGui::ColorEdit3("Color", CylColor);
-
-                ImGui::TreePop();
-            }
-            if (ImGui::TreeNode("Planes")) {
-                if (planes_num > PLANES_SIZE)
-                    planes_num = 0;
-                ImGui::InputInt("Number", &planes_num);
-                if (planes_num > PLANES_SIZE)
-                    planes_num = 0;
-                NormCoord[0] = planes_norm[planes_num].x;
-                NormCoord[1] = planes_norm[planes_num].y;
-                NormCoord[2] = planes_norm[planes_num].z;
-                ImGui::InputFloat3("Norm Coord", NormCoord);
-
-                PlaneParam = planes_col[planes_num].w;
-                if (PlaneStatus == 1) {
-                    ImGui::SliderFloat("Haze", &PlaneParam, 0, 1);
-                } else if (PlaneStatus == 3) {
-                    ImGui::SliderFloat("Reflection", &antiPlaneParam, 0, 1.99);
-                    PlaneParam = -antiPlaneParam;
-                } else if (PlaneStatus == 2) {
-                    ImGui::SliderFloat("Intention", &PlaneIntention, 0, 1);
-                }
-
-                PlaneColor[0] = planes_col[planes_num].x;
-                PlaneColor[1] = planes_col[planes_num].y;
-                PlaneColor[2] = planes_col[planes_num].z;
-                ImGui::ColorEdit3("Color", PlaneColor);
-
-                ImGui::TreePop();
-            }
-            if (ImGui::TreeNode("Cones")) {
-                if (cones_num > DEFAULT_SIZE)
-                    cones_num = 0;
-                ImGui::InputInt("Number", &cones_num);
-                if (cones_num > DEFAULT_SIZE)
-                    cones_num = 0;
-                ConeUpRadius = cones_up_point[cones_num].w;
-                ConeDownRadius = cones_down_point[cones_num].w;
-                ImGui::SliderFloat("Up Radius", &ConeUpRadius, 0, MAX_RADIUS);
-                ImGui::SliderFloat("Down Radius", &ConeDownRadius, 0,
-                                   MAX_RADIUS);
-
-                ConeX[0] = cones_up_point[cones_num].x;
-                ConeY[0] = cones_up_point[cones_num].y;
-                ConeZ[0] = cones_up_point[cones_num].z;
-                ConeX[1] = cones_down_point[cones_num].x;
-                ConeY[1] = cones_down_point[cones_num].y;
-                ConeZ[1] = cones_down_point[cones_num].z;
-                ImGui::InputFloat2("Up and Down X", ConeX);
-                ImGui::InputFloat2("Up and Down Y", ConeY);
-                ImGui::InputFloat2("Up and Down Z", ConeZ);
-
-                ConeParam = cones_col[cones_num].w;
-                if (ConeStatus == 1) {
-                    ImGui::SliderFloat("Haze", &ConeParam, 0, 1);
-                } else if (ConeStatus == 3) {
-                    ImGui::SliderFloat("Reflection", &antiConeParam, 0, 1.99);
-                    ConeParam = -antiConeParam;
-                } else if (ConeStatus == 2) {
-                    ImGui::SliderFloat("Intention", &ConeIntention, 0, 1);
-                }
-
-                ConeColor[0] = cones_col[cones_num].x;
-                ConeColor[1] = cones_col[cones_num].y;
-                ConeColor[2] = cones_col[cones_num].z;
-                ImGui::ColorEdit3("Color", ConeColor);
-                ImGui::TreePop();
-            }
-        }
-        ImGui::Separator();
-        ImGui::Text("For modifying graphic settings you can use:");
-        if (ImGui::CollapsingHeader("Graphic Settings")) {
-            ImGui::SliderFloat("Smooth", &Smooth, 0, MAX_SMOOTH);  // add
-            if (FPS < 0)
-                FPS = 10;
-            ImGui::InputInt("MaxFPS", &FPS, 10, 0);
-            ImGui::InputInt2("Resolution W X H", Resolution);
-            Resolution[0] = fabs(Resolution[0]);
-            Resolution[1] = fabs(Resolution[1]);
-            ImGui::Checkbox("VSYNC", &switcherVsync);
-        }
-        ImGui::End();
-
-        window.setVerticalSyncEnabled(Vsync);
-
-        if (show_fps) {
-            ImGui::SetNextWindowSize(
-                ImVec2(1000, 1000));  //, ImGuiCond_FirstUseEver);
-            ImGui::SetNextWindowPos(
-                ImVec2(1840, 5));  //, ImGuiCond_FirstUseEver);
-            ImGui::Begin("FPS", NULL, ImGuiFPSFlags);
-            ImGui::Text("FPS: %d", CurrentFPS);
             ImGui::End();
+            
+
+            if (show_fps) {
+                ImGui::SetNextWindowSize(
+                    ImVec2(1000, 1000));  //, ImGuiCond_FirstUseEver);
+                ImGui::SetNextWindowPos(
+                    ImVec2(1840, 5));  //, ImGuiCond_FirstUseEver);
+                ImGui::Begin("FPS", NULL, ImGuiFPSFlags);
+                ImGui::Text("FPS: %d", frame_counter);
+                ImGui::End();
+            }
+            if (show_resolution) {
+                ImGui::SetNextWindowSize(ImVec2(1000, 1000));
+                ImGui::SetNextWindowPos(ImVec2(1815, 20));
+                ImGui::Begin("Resolution", NULL, ImGuiFPSFlags);
+                ImGui::Text("%d x %d", Resolution[0], Resolution[1]);
+                ImGui::End();
+            }
+
+            spheres_pos[spheres_num].w = SphereRadius;
+            spheres_pos[spheres_num].x = SphereCoord[0];
+            spheres_pos[spheres_num].y = SphereCoord[1];
+            spheres_pos[spheres_num].z = SphereCoord[2];
+            spheres_col[spheres_num].x = SphereColor[0];
+            spheres_col[spheres_num].y = SphereColor[1];
+            spheres_col[spheres_num].z = SphereColor[2];
+            spheres_col[spheres_num].w = SphereParam;
+
+            boxes_pos[boxes_num].x = BoxCoord[0];
+            boxes_pos[boxes_num].y = BoxCoord[1];
+            boxes_pos[boxes_num].z = BoxCoord[2];
+            boxes_size[boxes_num].x = BoxLen;
+            boxes_size[boxes_num].y = BoxWi;
+            boxes_size[boxes_num].z = BoxHei;
+            boxes_col[boxes_num].x = BoxColor[0];
+            boxes_col[boxes_num].y = BoxColor[1];
+            boxes_col[boxes_num].z = BoxColor[2];
+            boxes_col[boxes_num].w = BoxParam;
+
+            cyl_down_point[cyl_num].x = CylX[0];
+            cyl_down_point[cyl_num].y = CylY[0];
+            cyl_down_point[cyl_num].z = CylZ[0];
+            cyl_up_point[cyl_num].x = CylX[1];
+            cyl_up_point[cyl_num].y = CylY[1];
+            cyl_up_point[cyl_num].z = CylZ[1];
+            cyl_up_point[cyl_num].w = CylRadius;
+            cyl_col[cyl_num].x = CylColor[0];
+            cyl_col[cyl_num].y = CylColor[1];
+            cyl_col[cyl_num].z = CylColor[2];
+            cyl_col[cyl_num].w = CylParam;
+
+            planes_norm[planes_num].x = NormCoord[0];
+            planes_norm[planes_num].y = NormCoord[1];
+            planes_norm[planes_num].z = NormCoord[2];
+            planes_col[planes_num].x = PlaneColor[0];
+            planes_col[planes_num].y = PlaneColor[1];
+            planes_col[planes_num].z = PlaneColor[2];
+            planes_col[planes_num].w = PlaneParam;
+
+            cones_up_point[cones_num].x = ConeX[0];
+            cones_up_point[cones_num].y = ConeY[0];
+            cones_up_point[cones_num].z = ConeZ[0];
+            cones_up_point[cones_num].w = ConeUpRadius;
+            cones_down_point[cones_num].x = ConeX[1];
+            cones_down_point[cones_num].y = ConeY[1];
+            cones_down_point[cones_num].z = ConeZ[1];
+            cones_down_point[cones_num].w = ConeDownRadius;
+            cones_col[cones_num].x = ConeColor[0];
+            cones_col[cones_num].y = ConeColor[1];
+            cones_col[cones_num].z = ConeColor[2];
+            cones_col[cones_num].w = ConeParam;
+
+            
+            window.setVerticalSyncEnabled(switcherVsync);
+
+            //window.setSize(sf::Vector2u(Resolution[0], Resolution[1])); set size with params
+            //settings.antialiasingLevel = Smooth;
+            //window.setamtianilacing ???? do it b urself -> AA level in Smooth int!
         }
-        if (show_resolution) {
-            ImGui::SetNextWindowSize(ImVec2(1000, 1000));
-            ImGui::SetNextWindowPos(ImVec2(1815, 20));
-            ImGui::Begin("Resolution", NULL, ImGuiFPSFlags);
-            ImGui::Text("%d x %d", Resolution[0], Resolution[1]);
-            ImGui::End();
-        }
-
-        spheres_pos[spheres_num].w = SphereRadius;
-        spheres_pos[spheres_num].x = SphereCoord[0];
-        spheres_pos[spheres_num].y = SphereCoord[1];
-        spheres_pos[spheres_num].z = SphereCoord[2];
-        spheres_col[spheres_num].x = SphereColor[0];
-        spheres_col[spheres_num].y = SphereColor[1];
-        spheres_col[spheres_num].z = SphereColor[2];
-        spheres_col[spheres_num].w = SphereParam;
-
-        boxes_pos[boxes_num].x = BoxCoord[0];
-        boxes_pos[boxes_num].y = BoxCoord[1];
-        boxes_pos[boxes_num].z = BoxCoord[2];
-        boxes_size[boxes_num].x = BoxLen;
-        boxes_size[boxes_num].y = BoxWi;
-        boxes_size[boxes_num].z = BoxHei;
-        boxes_col[boxes_num].x = BoxColor[0];
-        boxes_col[boxes_num].y = BoxColor[1];
-        boxes_col[boxes_num].z = BoxColor[2];
-        // boxes_col[boxes_num].w = BoxParam;
-
-        cyl_down_point[cyl_num].x = CylX[0];
-        cyl_down_point[cyl_num].y = CylY[0];
-        cyl_down_point[cyl_num].z = CylZ[0];
-        cyl_up_point[cyl_num].x = CylX[1];
-        cyl_up_point[cyl_num].y = CylY[1];
-        cyl_up_point[cyl_num].z = CylZ[1];
-        cyl_up_point[cyl_num].w = CylRadius;
-        cyl_col[cyl_num].x = CylColor[0];
-        cyl_col[cyl_num].y = CylColor[1];
-        cyl_col[cyl_num].z = CylColor[2];
-
-        planes_norm[planes_num].x = NormCoord[0];
-        planes_norm[planes_num].y = NormCoord[1];
-        planes_norm[planes_num].z = NormCoord[2];
-        planes_col[planes_num].x = PlaneColor[0];
-        planes_col[planes_num].y = PlaneColor[1];
-        planes_col[planes_num].z = PlaneColor[2];
-
-        cones_up_point[cones_num].x = ConeX[0];
-        cones_up_point[cones_num].y = ConeY[0];
-        cones_up_point[cones_num].z = ConeZ[0];
-        cones_up_point[cones_num].w = ConeUpRadius;
-        cones_down_point[cones_num].x = ConeX[1];
-        cones_down_point[cones_num].y = ConeY[1];
-        cones_down_point[cones_num].z = ConeZ[1];
-        cones_down_point[cones_num].w = ConeDownRadius;
-        cones_col[cones_num].x = ConeColor[0];
-        cones_col[cones_num].y = ConeColor[1];
-        cones_col[cones_num].z = ConeColor[2];
 
         shader.setUniform("u_time", u_time);
         shader.setUniform("u_camera_pos", camera_position);
