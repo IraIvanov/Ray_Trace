@@ -261,6 +261,13 @@ int main() {
 
     ImGui::SFML::Init(window);
 
+    spheres_num = -1;
+    cones_num = -1;
+    cyl_num = -1;
+    boxes_num = -1;
+    planes_num = 1;
+    
+
     while (window.isOpen()) {  // main lopp
 
         sf::Event event;
@@ -478,10 +485,10 @@ int main() {
             if (ImGui::CollapsingHeader("Objects Settings")) {
                 if (ImGui::TreeNode("Spheres")) {
                     if (spheres_num > DEFAULT_SIZE)
-                        spheres_num = 0;
+                        spheres_num = -1;
                     ImGui::InputInt("Number", &spheres_num);
                     if (spheres_num > DEFAULT_SIZE)
-                        spheres_num = 0;
+                        spheres_num = -1;
                     SphereRadius = spheres_pos[spheres_num].w;
                     ImGui::SliderFloat("Radius", &SphereRadius, 0, MAX_RADIUS);
                     SphereCoord[0] = spheres_pos[spheres_num].x;
@@ -514,10 +521,10 @@ int main() {
                 }
                 if (ImGui::TreeNode("Boxes")) {
                     if (boxes_num > DEFAULT_SIZE)
-                        boxes_num = 0;
+                        boxes_num = -1;
                     ImGui::InputInt("Number", &boxes_num);
                     if (boxes_num > DEFAULT_SIZE)
-                        boxes_num = 0;
+                        boxes_num = -1;
                     BoxSize[0] = boxes_size[boxes_num].x;
                     BoxSize[1] = boxes_size[boxes_num].y;
                     BoxSize[2] = boxes_size[boxes_num].z;
@@ -551,10 +558,10 @@ int main() {
                 }
                 if (ImGui::TreeNode("Cylindres")) {
                     if (cyl_num > DEFAULT_SIZE)
-                        cyl_num = 0;
+                        cyl_num = -1;
                     ImGui::InputInt("Number", &cyl_num);
                     if (cyl_num > DEFAULT_SIZE)
-                        cyl_num = 0;
+                        cyl_num = -1;
                     CylRadius = cyl_up_point[cyl_num].w;
                     ImGui::SliderFloat("Radius", &CylRadius, 0, MAX_RADIUS);
                     CylX[0] = cyl_up_point[cyl_num].x;
@@ -595,10 +602,10 @@ int main() {
                 }
                 if (ImGui::TreeNode("Planes")) {
                     if (planes_num > PLANES_SIZE)
-                        planes_num = 0;
+                        planes_num = -1;
                     ImGui::InputInt("Number", &planes_num);
                     if (planes_num > PLANES_SIZE)
-                        planes_num = 0;
+                        planes_num = -1;
                     NormCoord[0] = planes_norm[planes_num].x;
                     NormCoord[1] = planes_norm[planes_num].y;
                     NormCoord[2] = planes_norm[planes_num].z;
@@ -631,10 +638,10 @@ int main() {
                 }
                 if (ImGui::TreeNode("Cones")) {
                     if (cones_num > DEFAULT_SIZE)
-                        cones_num = 0;
+                        cones_num = -1;
                     ImGui::InputInt("Number", &cones_num);
                     if (cones_num > DEFAULT_SIZE)
-                        cones_num = 0;
+                        cones_num = -1;
                     ConeRadius[0] = cones_up_point[cones_num].w;
                     ConeRadius[1] = cones_down_point[cones_num].w;
                     ImGui::SliderFloat2("Up and down Radius", ConeRadius, 0, MAX_RADIUS);
@@ -663,7 +670,7 @@ int main() {
                         ImGui::SliderFloat("Reflection", &antiConeParam, 0, 1.99);
                         ConeParam = -antiConeParam;
                     } else if (ConeStatus == 2) {
-                        BoxParam = -2;
+                        ConeParam = -2;
                         ImGui::SliderFloat("Intention", &ConeIntention, 0, 1);
                     }
 
@@ -729,9 +736,9 @@ int main() {
             cyl_down_point[cyl_num].x = CylX[0];
             cyl_down_point[cyl_num].y = CylY[0];
             cyl_down_point[cyl_num].z = CylZ[0];
-            cyl_up_point[cyl_num].x = CylX[1];
+            cyl_up_point[cyl_num].x = CylX[0];
             cyl_up_point[cyl_num].y = CylY[1];
-            cyl_up_point[cyl_num].z = CylZ[1];
+            cyl_up_point[cyl_num].z = CylZ[2];
             cyl_up_point[cyl_num].w = CylRadius;
             cyl_col[cyl_num].x = CylColor[0];
             cyl_col[cyl_num].y = CylColor[1];
