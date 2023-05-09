@@ -18,6 +18,9 @@
 #define MAX_COORD 100
 #define MAX_SMOOTH 100
 
+#define ImGuiFPSFlags ImGuiWindowFlags_NoTitleBar|ImGuiWindowFlags_NoBackground|ImGuiWindowFlags_NoResize|ImGuiWindowFlags_NoCollapse|ImGuiWindowFlags_NoMove
+#define ImGuiSettingsFlags ImGuiWindowFlags_MenuBar|ImGuiWindowFlags_NoCollapse|ImGuiWindowFlags_NoMove|ImGuiWindowFlags_NoResize
+
 int main() {
     sf::RenderWindow window ( sf::VideoMode( WIDTH, HIGHT ), "RayTrace window", sf::Style::Fullscreen );
     ImGui::SFML::Init(window);
@@ -58,9 +61,22 @@ int main() {
 
     bool switcherLcontrol = true;
     bool switcherEscape = false;
+    bool switcherVsync;
+    
 
     float Smooth = 0;
+    int CurrentFPS = 0;
     int FPS = 120;
+    int Resolution[2] = {1920, 1080}; 
+
+    bool show_fps = false;
+     
+    bool show_smooth = false;
+    bool show_resolution = false;
+    bool Vsync = false;
+    int style_idx = 0;
+    bool change_font = false;
+
     //bool ControlKeys[CONTROL_KEYS_NUM] = { false };
 
     // setting random 
@@ -395,43 +411,67 @@ int main() {
         time = clock.getElapsedTime();
         float u_time = time.asSeconds();
 
-        
-        ImGui::Begin("Settings Window", NULL, ImGuiWindowFlags_MenuBar);
-
+        ImGui::SetNextWindowSize(ImVec2(598, 555));//, ImGuiCond_FirstUseEver);
+        ImGui::SetNextWindowPos(ImVec2(0, 0));//, ImGuiCond_FirstUseEver);
+        ImGui::Begin("Settings Window", NULL, ImGuiSettingsFlags);
+ 
         if (ImGui::BeginMenuBar())
         {
             if (ImGui::BeginMenu("Appearance"))
             {
-                ImGui::MenuItem("Switch Theme"); //add
-                ImGui::MenuItem("Switch Font");
+                if(ImGui::BeginMenu("Switch Theme"))
+                {
+                    ImGui::Combo("Theme", &style_idx, "Dark\0Light\0Classic\0\0");
+                    switch (style_idx)
+                    {
+                    case 0: ImGui::StyleColorsDark(); break;
+                    case 1: ImGui::StyleColorsLight(); break;
+                    case 2: ImGui::StyleColorsClassic(); break;
+                    }
+                    ImGui::EndMenu();
+                }
+                ImGui::MenuItem("Switch Font", NULL, &change_font); 
 
                 ImGui::EndMenu();
             }
             if(ImGui::BeginMenu("Data"))
             {
-                ImGui::MenuItem("FPS Show"); //add
-                ImGui::MenuItem("Resolution Show");
-                
-
+                ImGui::MenuItem("FPS Show", NULL, &show_fps); 
+                ImGui::MenuItem("Resolution Show", NULL, &show_resolution);
                 ImGui::EndMenu();
             }
             if(ImGui::BeginMenu("Credits"))
             {
-                ImGui::MenuItem("AWESOMESLAYER");
-                //Type our names and other info
+                if(ImGui::BeginMenu("AWES0MESLAYER"))
+                {
+                    ImGui::TextColored(ImVec4(1.0f, 0.0f, 1.0f, 1.0f), "MOST HATED");
+                    ImGui::EndMenu();
+                }
+                if(ImGui::BeginMenu("OLE G"))
+                {
+                    ImGui::TextColored(ImVec4(0.7f, 0.5f, 1.0f, 0.8f), "EGG FRYER");
+                    ImGui::EndMenu();
+                }
+                if(ImGui::BeginMenu("IraIvanov"))
+                {
+                    ImGui::TextColored(ImVec4(0.9f, 0.35f, 0.34f, 0.99f), "$ad boy");
+                    ImGui::EndMenu();
+                }
                 ImGui::EndMenu();
             }
             ImGui::EndMenuBar();
         }
-
+        ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Welcome to the Settings of Ray_Tracing Project v2.28!");
+        ImGui::Separator();
         ImGui::Text("You can modify and add objects using this settings:");
         
         if(ImGui::CollapsingHeader("Objects Settings"))
         {
-            if(ImGui::CollapsingHeader("Spheres"))
+            if(ImGui::TreeNode("Spheres"))
             {
-            
-                ImGui::InputInt("Number", &spheres_num, 0, DEFAULT_SIZE);
+                if(spheres_num > DEFAULT_SIZE)
+                    spheres_num = 0;
+                ImGui::InputInt("Number", &spheres_num);
                 if(spheres_num > DEFAULT_SIZE)
                     spheres_num = 0;
                 SphereRadius = spheres_pos[spheres_num].w;
@@ -465,11 +505,13 @@ int main() {
                 ImGui::ColorEdit3("Color", SphereColor);
                 ImGui::SeparatorText("Sun Light Slider:");
                 ImGui::SliderFloat("Light", &sun_brightness, 0, 1);
-            
+                ImGui::TreePop();
             }
-            else if(ImGui::CollapsingHeader("Boxes"))
+            if(ImGui::TreeNode("Boxes"))
             {
-                ImGui::InputInt("Number", &boxes_num, 0, DEFAULT_SIZE);
+                if(boxes_num > DEFAULT_SIZE)
+                    boxes_num = 0;
+                ImGui::InputInt("Number", &boxes_num);
                 if(boxes_num > DEFAULT_SIZE)
                     boxes_num = 0;
                 BoxLen = boxes_size[boxes_num].x;
@@ -505,11 +547,14 @@ int main() {
                 BoxColor[1] = boxes_col[boxes_num].y;
                 BoxColor[2] = boxes_col[boxes_num].z;    
                 ImGui::ColorEdit3("Color", BoxColor);
+                ImGui::TreePop();
             
             }
-            else if(ImGui::CollapsingHeader("Cylindres"))
+            if(ImGui::TreeNode("Cylindres"))
             {
-                ImGui::InputInt("Number", &cyl_num, 0, DEFAULT_SIZE);
+                if(cyl_num > DEFAULT_SIZE)
+                    cyl_num = 0;
+                ImGui::InputInt("Number", &cyl_num);
                 if(cyl_num > DEFAULT_SIZE)
                     cyl_num = 0;
                 CylRadius = cyl_up_point[cyl_num].w;
@@ -544,10 +589,14 @@ int main() {
                 CylColor[1]=cyl_col[cyl_num].y;
                 CylColor[2]=cyl_col[cyl_num].z;
                 ImGui::ColorEdit3("Color", CylColor);
+
+                ImGui::TreePop();
             }
-            else if(ImGui::CollapsingHeader("Planes"))
-            {
-                ImGui::InputInt("Number", &planes_num, 0, PLANES_SIZE);
+            if(ImGui::TreeNode("Planes"))
+            { 
+                if(planes_num > PLANES_SIZE)
+                    planes_num = 0;
+                ImGui::InputInt("Number", &planes_num);
                 if(planes_num > PLANES_SIZE)
                     planes_num = 0;
                 NormCoord[0] = planes_norm[planes_num].x;
@@ -574,10 +623,14 @@ int main() {
                 PlaneColor[1] = planes_col[planes_num].y;
                 PlaneColor[2] = planes_col[planes_num].z;
                 ImGui::ColorEdit3("Color", PlaneColor);
+
+                ImGui::TreePop();
             }
-            else if(ImGui::CollapsingHeader("Cones"))
+            if(ImGui::TreeNode("Cones"))
             {
-                ImGui::InputInt("Number", &cones_num, 0, DEFAULT_SIZE); 
+                if(cones_num >DEFAULT_SIZE)
+                    cones_num = 0;
+                ImGui::InputInt("Number", &cones_num); 
                 if(cones_num >DEFAULT_SIZE)
                     cones_num = 0;
                 ConeUpRadius = cones_up_point[cones_num].w;
@@ -614,6 +667,7 @@ int main() {
                 ConeColor[1] = cones_col[cones_num].y;
                 ConeColor[2] = cones_col[cones_num].z;
                 ImGui::ColorEdit3("Color", ConeColor);
+                ImGui::TreePop();
             }
         }
         ImGui::Separator();
@@ -621,16 +675,35 @@ int main() {
         if(ImGui::CollapsingHeader("Graphic Settings"))
         {
             ImGui::SliderFloat("Smooth", &Smooth, 0, MAX_SMOOTH); //add
-            ImGui::InputInt("FPS", &FPS); //add 
-            //Resoluiton
-            // Vsync
+            if(FPS < 0)
+                FPS = 10;
+            ImGui::InputInt("MaxFPS", &FPS, 10, 0); 
+            ImGui::InputInt2("Resolution W X H", Resolution);
+            Resolution[0] = fabs(Resolution[0]);
+            Resolution[1] = fabs(Resolution[1]);
+            ImGui::Checkbox("VSYNC", &switcherVsync);
         }
         ImGui::End();
 
-        
-        //ImGui::ShowDemoWindow();
 
-       
+        window.setVerticalSyncEnabled(Vsync);
+
+        if(show_fps)
+        {
+            ImGui::SetNextWindowSize(ImVec2(1000, 1000));//, ImGuiCond_FirstUseEver);
+            ImGui::SetNextWindowPos(ImVec2(1840, 5));//, ImGuiCond_FirstUseEver);
+            ImGui::Begin("FPS", NULL, ImGuiFPSFlags);
+            ImGui::Text("FPS: %d", CurrentFPS);
+            ImGui::End();
+        }
+        if(show_resolution)
+        {
+            ImGui::SetNextWindowSize(ImVec2(1000, 1000));
+            ImGui::SetNextWindowPos(ImVec2(1815, 20));
+            ImGui::Begin("Resolution", NULL, ImGuiFPSFlags);
+            ImGui::Text("%d x %d", Resolution[0], Resolution[1]);
+            ImGui::End();
+        }
 
         spheres_pos[spheres_num].w = SphereRadius;
         spheres_pos[spheres_num].x = SphereCoord[0];
