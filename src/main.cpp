@@ -2,15 +2,13 @@
 #include <SFML/OpenGL.hpp>
 #include <SFML/System/Clock.hpp>
 #include <SFML/Window/Event.hpp>
-
-#include "../include/ImGui/imgui-SFML.h"
-#include "../include/ImGui/imgui.h"
-#include "../include/ImGui/imgui_demo.cpp"
-
 #include <cmath>
 #include <iostream>
 #include <random>
 
+#include "../include/ImGui/imgui-SFML.h"
+#include "../include/ImGui/imgui.h"
+#include "../include/ImGui/imgui_demo.cpp"
 #include "../include/config.hpp"
 
 #define MAX_RADIUS 10
@@ -18,18 +16,16 @@
 #define MAX_SMOOTH 100
 
 int main() {
+    // window and graphics settings
+
     sf::RenderWindow window(sf::VideoMode(WIDTH, HIGHT), "RayTrace",
                             sf::Style::Fullscreen,
                             sf::ContextSettings(0, 0, 0));
-    window.setMouseCursorVisible(false);
-
-    ImGui::SFML::Init(window);
     window.setFramerateLimit(MAX_FPS);
     window.setVerticalSyncEnabled(false);
-
     glEnable(GL_MULTISAMPLE_ARB);
 
-    window.setMouseCursorVisible(false);
+    // shader settings
 
     sf::Shader shader;
 
@@ -53,7 +49,10 @@ int main() {
     sf::Clock clock;
     sf::Time time;
 
-    // sf::Mouse::setPosition(sf::Vector2i(WIDTH / 2, HIGHT / 2), window);
+    // cursor settings
+
+    bool MouseCursorVisible = false;
+    sf::Mouse::setPosition(sf::Vector2i(WIDTH / 2, HIGHT / 2), window);
     sf::Vector2i mouse_pos = sf::Mouse::getPosition();
     sf::Vector2i current_mouse_pos;
 
@@ -61,6 +60,11 @@ int main() {
     int mouse_y = HIGHT / 2;
     int mouse_move_x = 0;
     int mouse_move_y = 0;
+
+    // camera settings
+
+    sf::Vector3f camera_position(0.f, 0.f, 0.f);
+    sf::Vector3f camera_movement(0.f, 0.f, 0.f);
 
     int FrameStill = 1;
 
@@ -70,17 +74,19 @@ int main() {
     float Smooth = 0;
     int FPS = 120;
 
-    // setting random
+    // random settings
 
     std::random_device rd;
     std::mt19937 e2(rd());
     std::uniform_real_distribution<> dist(0.0f, 1.0f);
 
-    // setting scene
+    // scene settings
 
     float sun_brightness = 0.02;
 
     sf::Glsl::Vec3 ulight_pos = sf::Glsl::Vec3(0.4f, -0.75f, 0.8f);
+
+    // sphere settings
 
     sf::Glsl::Vec4 spheres_pos[DEFAULT_SIZE];
     sf::Glsl::Vec4 spheres_col[DEFAULT_SIZE];
@@ -94,10 +100,13 @@ int main() {
 
     spheres_pos[10] = sf::Glsl::Vec4(4.f, -4.f, 2.f, 0.75f);
     spheres_col[10] = sf::Glsl::Vec4(1.f, 0.2, 0.1, 1.f);
+
     spheres_pos[11] = sf::Glsl::Vec4(4.f, 0.f, 0.f, 1.f);
     spheres_col[11] = sf::Glsl::Vec4(1.f, 1.f, 1.f, -2.f);
+
     spheres_pos[12] = sf::Glsl::Vec4(-4.f, 0.f, 0.f, 1.f);
     spheres_col[12] = sf::Glsl::Vec4(1.f, 1.f, 1.f, 0.f);
+
     spheres_pos[13] = sf::Glsl::Vec4(10.f, 0.f, 0.f, 1.f);
     spheres_col[13] = sf::Glsl::Vec4(1.f, 1.f, 1.f, -1.5);
 
@@ -105,6 +114,8 @@ int main() {
         spheres_pos[i] = sf::Glsl::Vec4(0.f, 0.f, 0.f, 0.f);
         spheres_col[i] = sf::Glsl::Vec4(0.f, 0.f, 0.f, 0.f);
     }
+
+    // boxes settings
 
     sf::Glsl::Vec3 boxes_pos[DEFAULT_SIZE];
     sf::Glsl::Vec3 boxes_size[DEFAULT_SIZE];
@@ -119,13 +130,14 @@ int main() {
     }
 
     boxes_pos[0] = sf::Glsl::Vec3(4.f, -4.f, 0.f);
-    boxes_pos[1] = sf::Glsl::Vec3(4.f, -10.f, 0.f);
-
     boxes_size[0] = sf::Glsl::Vec3(1.f, 1.f, 1.f);
-    boxes_size[1] = sf::Glsl::Vec3(1.f, 1.f, 1.f);
-
     boxes_col[0] = sf::Glsl::Vec4(0.4, 0.6, 0.8, 1.f);
+
+    boxes_pos[1] = sf::Glsl::Vec3(4.f, -10.f, 0.f);
+    boxes_size[1] = sf::Glsl::Vec3(1.f, 1.f, 1.f);
     boxes_col[1] = sf::Glsl::Vec4(0.6, 0.4, 0.5, 0.8);
+
+    // plane settings
 
     sf::Glsl::Vec3 planes_norm[PLANES_SIZE];
     sf::Glsl::Vec4 planes_col[PLANES_SIZE];
@@ -139,6 +151,8 @@ int main() {
 
     planes_norm[0] = sf::Glsl::Vec3(0.f, 0.f, -1.f);
     planes_col[0] = sf::Glsl::Vec4(0.5, 0.5, 0.5, 1.f);
+
+    // cones settings
 
     sf::Glsl::Vec4 cones_down_point[DEFAULT_SIZE];
     sf::Glsl::Vec4 cones_up_point[DEFAULT_SIZE];
@@ -160,6 +174,8 @@ int main() {
     sf::Glsl::Vec4 cyl_up_point[DEFAULT_SIZE];
     sf::Glsl::Vec4 cyl_col[DEFAULT_SIZE];
 
+    // cylinders settings
+
     int cyl_num = 0;
 
     for (int i = 0; i < DEFAULT_SIZE; i++) {
@@ -171,9 +187,6 @@ int main() {
     cyl_down_point[0] = sf::Glsl::Vec3(4.f, 8.f, 1.f);
     cyl_up_point[0] = sf::Glsl::Vec4(4.f, 8.f, -2.f, 0.5);
     cyl_col[0] = sf::Glsl::Vec4(0.1, 0.6, 0.7, 1.f);
-
-    sf::Vector3f camera_position(0.f, 0.f, 0.f);
-    sf::Vector3f camera_movement(0.f, 0.f, 0.f);
 
     float SphereRadius = 1;
     int SphereCoord[3] = {};
@@ -187,10 +200,6 @@ int main() {
     float BoxHei = 1;
     float BoxWi = 1;
     int BoxCoord[3] = {};
-    // float BoxParam = 1;
-    // float antiBoxParam = -1;
-    // int BoxStatus = 2;
-    // float BoxIntention = 50;
     float BoxColor[3] = {(float)204 / 255, (float)77 / 255, (float)5 / 255};
 
     float CylRadius = 1;
@@ -215,135 +224,128 @@ int main() {
     int frame_counter = 0;
     sf::Time delta_time;
 
-    while (window.isOpen()) { // main loop
+    ImGui::SFML::Init(window);
+
+    while (window.isOpen()) {  // main lopp
 
         sf::Event event;
 
-        while (window.pollEvent(event)) { // event loop
+        while (window.pollEvent(event)) {  // event loop
 
             ImGui::SFML::ProcessEvent(window, event);
 
             switch (event.type) {
-
-            case (sf::Event::Closed):
-                window.close();
-                break;
-            case (sf::Event::MouseMoved):
-
-                if (switcherEscape)
+                case (sf::Event::Closed):
+                    window.close();
                     break;
+                case (sf::Event::MouseMoved):
 
-                current_mouse_pos = sf::Mouse::getPosition();
-                mouse_move_x = (current_mouse_pos.x - mouse_pos.x);
-                mouse_move_y = (current_mouse_pos.y - mouse_pos.y);
-                mouse_x += mouse_move_x;
-                mouse_y += mouse_move_y;
+                    if (switcherEscape)
+                        break;
 
-                mouse_pos = current_mouse_pos;
+                    current_mouse_pos = sf::Mouse::getPosition();
+                    mouse_move_x = (current_mouse_pos.x - mouse_pos.x);
+                    mouse_move_y = (current_mouse_pos.y - mouse_pos.y);
+                    mouse_x += mouse_move_x;
+                    mouse_y += mouse_move_y;
 
-                if (abs(current_mouse_pos.x - WIDTH / 2) > 10) {
+                    mouse_pos = current_mouse_pos;
 
-                    sf::Mouse::setPosition(sf::Vector2i(WIDTH / 2, HIGHT / 2),
-                                           window);
-                    mouse_pos = sf::Vector2i(WIDTH / 2, HIGHT / 2);
-                }
+                    if (abs(current_mouse_pos.x - WIDTH / 2) > 10) {
+                        sf::Mouse::setPosition(
+                            sf::Vector2i(WIDTH / 2, HIGHT / 2), window);
+                        mouse_pos = sf::Vector2i(WIDTH / 2, HIGHT / 2);
+                    }
 
-                if (mouse_move_x != 0 || mouse_move_y != 0)
-                    FrameStill = 1;
-
-                break;
-
-            case (sf::Event::KeyPressed):
-
-                switch (event.key.code) {
-
-                case (sf::Keyboard::W):
-
-                    camera_movement.x = WALKING_PACE;
-                    FrameStill = 1;
-
-                    break;
-
-                case (sf::Keyboard::A):
-
-                    camera_movement.y = -WALKING_PACE;
-                    FrameStill = 1;
-
-                    break;
-
-                case (sf::Keyboard::S):
-
-                    camera_movement.x = -WALKING_PACE;
-                    FrameStill = 1;
-
-                    break;
-
-                case (sf::Keyboard::D):
-
-                    camera_movement.y = WALKING_PACE;
-                    FrameStill = 1;
-
-                    break;
-
-                case (sf::Keyboard::Up):
-
-                    camera_movement.z = -WALKING_PACE;
-                    FrameStill = 1;
-
-                    break;
-
-                case (sf::Keyboard::Down):
-
-                    camera_movement.z = WALKING_PACE;
-                    FrameStill = 1;
-
-                    break;
-
-                case (sf::Keyboard::LControl):
-
-                    if (switcherLcontrol == false) {
-
-                        shader.loadFromFile("./src/raytracing.frag",
-                                            sf::Shader::Fragment);
-                        shader.setUniform("u_resolution",
-                                          sf::Vector2f(WIDTH, HIGHT));
-                        switcherLcontrol = true;
+                    if (mouse_move_x != 0 || mouse_move_y != 0)
                         FrameStill = 1;
 
-                    } else {
+                    break;
 
-                        shader.loadFromFile("./src/raycast.frag",
-                                            sf::Shader::Fragment);
-                        shader.setUniform("u_resolution",
-                                          sf::Vector2f(WIDTH, HIGHT));
-                        switcherLcontrol = false;
+                case (sf::Event::KeyPressed):
+
+                    switch (event.key.code) {
+                        case (sf::Keyboard::W):
+
+                            camera_movement.x = WALKING_PACE;
+                            FrameStill = 1;
+
+                            break;
+
+                        case (sf::Keyboard::A):
+
+                            camera_movement.y = -WALKING_PACE;
+                            FrameStill = 1;
+
+                            break;
+
+                        case (sf::Keyboard::S):
+
+                            camera_movement.x = -WALKING_PACE;
+                            FrameStill = 1;
+
+                            break;
+
+                        case (sf::Keyboard::D):
+
+                            camera_movement.y = WALKING_PACE;
+                            FrameStill = 1;
+
+                            break;
+
+                        case (sf::Keyboard::Up):
+
+                            camera_movement.z = -WALKING_PACE;
+                            FrameStill = 1;
+
+                            break;
+
+                        case (sf::Keyboard::Down):
+
+                            camera_movement.z = WALKING_PACE;
+                            FrameStill = 1;
+
+                            break;
+
+                        case (sf::Keyboard::LControl):
+
+                            if (switcherLcontrol == false) {
+                                shader.loadFromFile("./src/raytracing.frag",
+                                                    sf::Shader::Fragment);
+                                shader.setUniform("u_resolution",
+                                                  sf::Vector2f(WIDTH, HIGHT));
+                                switcherLcontrol = true;
+                                FrameStill = 1;
+
+                            } else {
+                                shader.loadFromFile("./src/raycast.frag",
+                                                    sf::Shader::Fragment);
+                                shader.setUniform("u_resolution",
+                                                  sf::Vector2f(WIDTH, HIGHT));
+                                switcherLcontrol = false;
+                            }
+
+                            break;
+
+                        case (sf::Keyboard::Escape):
+
+                            if (switcherEscape == false) {  // on pause
+                                switcherEscape = true;
+                                window.setMouseCursorVisible(switcherEscape);
+
+                            } else {  // leave pause
+                                switcherEscape = false;
+                                window.setMouseCursorVisible(switcherEscape);
+                            }
+
+                        default:
+                            break;
                     }
 
                     break;
-
-                case (sf::Keyboard::Escape):
-
-                    if (switcherEscape == false) {
-
-                        // on pause
-                        switcherEscape = true;
-                        window.setMouseCursorVisible(switcherEscape);
-
-                    } else {
-
-                        // leave pause
-                        switcherEscape = false;
-                        window.setMouseCursorVisible(switcherEscape);
-                    }
 
                 default:
                     break;
-                }
-
-                break;
-
-            default:
-                break;
             }
         }
 
@@ -395,7 +397,6 @@ int main() {
 
         if (ImGui::CollapsingHeader("Objects Settings")) {
             if (ImGui::CollapsingHeader("Spheres")) {
-
                 ImGui::InputInt("Number", &spheres_num, 0, DEFAULT_SIZE);
                 ImGui::SliderFloat("Radius", &SphereRadius, 0, MAX_RADIUS);
                 ImGui::InputInt3("Coord", SphereCoord);
@@ -566,11 +567,16 @@ int main() {
 
         ImGui::SFML::Render(window);
 
+        if (!MouseCursorVisible) {
+            window.setMouseCursorVisible(MouseCursorVisible);
+            MouseCursorVisible = true;
+        }
+
         window.display();
+
         delta_time += fps_clock.restart();
         frame_counter++;
         if (delta_time.asSeconds() >= 1.f) {
-
             std::cout << "FPS: " << frame_counter << std::endl;
 
             frame_counter = 0;
