@@ -198,7 +198,7 @@ int main() {
     float BoxIntention = 0;
     float BoxColor[3] = {(float)204 / 255, (float)77 / 255, (float)5 / 255};
 
-    float CylRadius =01;
+    float CylRadius =0;
     float CylX[2] = {};
     float CylY[2] = {};
     float CylZ[2] = {};
@@ -536,16 +536,17 @@ int main() {
                         cyl_num = 0;
                     CylRadius = cyl_up_point[cyl_num].w;
                     ImGui::SliderFloat("Radius", &CylRadius, 0, MAX_RADIUS);
+
                     CylX[0] = cyl_up_point[cyl_num].x;
-                    CylX[1] = cyl_down_point[cyl_num].x;
                     CylY[0] = cyl_up_point[cyl_num].y;
-                    CylY[1] = cyl_down_point[cyl_num].y;
                     CylZ[0] = cyl_up_point[cyl_num].z;
+                    CylX[1] = cyl_down_point[cyl_num].x;
+                    CylY[1] = cyl_down_point[cyl_num].y;
                     CylZ[1] = cyl_down_point[cyl_num].z;
 
-                    ImGui::InputFloat2("Up and Down X", CylX);
-                    ImGui::InputFloat2("Up and Down Y", CylY);
-                    ImGui::InputFloat2("Up and Down Z", CylZ);
+                    ImGui::InputFloat2("Up and Down X", ConeX);
+                    ImGui::InputFloat2("Up and Down Y", ConeY);
+                    ImGui::InputFloat2("Up and Down Z", ConeZ);
 
                     ImGui::RadioButton("Haze", &CylStatus, 1);
                     ImGui::SameLine();
@@ -711,9 +712,9 @@ int main() {
             cyl_down_point[cyl_num].x = CylX[0];
             cyl_down_point[cyl_num].y = CylY[0];
             cyl_down_point[cyl_num].z = CylZ[0];
-            cyl_up_point[cyl_num].x = CylX[0];
+            cyl_up_point[cyl_num].x = CylX[1];
             cyl_up_point[cyl_num].y = CylY[1];
-            cyl_up_point[cyl_num].z = CylZ[2];
+            cyl_up_point[cyl_num].z = CylZ[1];
             cyl_up_point[cyl_num].w = CylRadius;
             cyl_col[cyl_num].x = CylColor[0];
             cyl_col[cyl_num].y = CylColor[1];
