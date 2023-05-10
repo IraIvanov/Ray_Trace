@@ -544,9 +544,9 @@ int main() {
                     CylY[1] = cyl_down_point[cyl_num].y;
                     CylZ[1] = cyl_down_point[cyl_num].z;
 
-                    ImGui::InputFloat2("Up and Down X", ConeX);
-                    ImGui::InputFloat2("Up and Down Y", ConeY);
-                    ImGui::InputFloat2("Up and Down Z", ConeZ);
+                    ImGui::InputFloat2("Up and Down X", CylX);
+                    ImGui::InputFloat2("Up and Down Y", CylY);
+                    ImGui::InputFloat2("Up and Down Z", CylZ);
 
                     ImGui::RadioButton("Haze", &CylStatus, 1);
                     ImGui::SameLine();
@@ -709,12 +709,12 @@ int main() {
             boxes_col[boxes_num].z = BoxColor[2];
             boxes_col[boxes_num].w = BoxParam;
 
-            cyl_down_point[cyl_num].x = CylX[0];
-            cyl_down_point[cyl_num].y = CylY[0];
-            cyl_down_point[cyl_num].z = CylZ[0];
-            cyl_up_point[cyl_num].x = CylX[1];
-            cyl_up_point[cyl_num].y = CylY[1];
-            cyl_up_point[cyl_num].z = CylZ[1];
+            cyl_down_point[cyl_num].x = CylX[1];
+            cyl_down_point[cyl_num].y = CylY[1];
+            cyl_down_point[cyl_num].z = CylZ[1];
+            cyl_up_point[cyl_num].x = CylX[0];
+            cyl_up_point[cyl_num].y = CylY[0];
+            cyl_up_point[cyl_num].z = CylZ[0];
             cyl_up_point[cyl_num].w = CylRadius;
             cyl_col[cyl_num].x = CylColor[0];
             cyl_col[cyl_num].y = CylColor[1];
